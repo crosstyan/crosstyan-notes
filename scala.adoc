@@ -1,0 +1,687 @@
+= Hello World Scala
+
+== Normal Way
+Just like Java the old days. Although I hate Java. 
+
+[source,scala]
+----
+object SayHello {
+  def hello(msg:String): Unit = 
+    println("Hello world!")
+    println(msg)
+  def main(args:Array[String]): Unit = {
+    def msg = "I was compiled by Scala 3. :)"
+    hello(msg)
+    // this.hello(msg) also works
+  }
+}
+----
+== Extends App
+https://stackoverflow.com/questions/11667630/difference-between-using-app-trait-and-main-method-in-scala[Difference between using App trait and main method in scala]
+[source,scala]
+----
+object SayHello extends App{
+  def main(args:Array[String]): Unit = {
+    def msg = "I was compiled by Scala 3. :)"
+    println("Hello world!")
+    println(msg)
+  }
+}
+----
+
+== Scala 3 @main
+
+- https://docs.scala-lang.org/scala3/book/methods-main-methods.html[MAIN METHODS]
+- https://docs.scala-lang.org/scala3/book/scala-for-javascript-devs.html[SCALA FOR JAVASCRIPT DEVELOPERS]
+
+[source,scala]
+----
+// Metals in VSCode will complaint, but it works! 
+// ! try to import a build created by sbt in scala 3, Metals won't complaint! 
+@main def hello: Unit = 
+    println("Hello world!")
+    println(msg)
+def msg = "I was compiled by Scala 3. :)"
+// val function and def method 
+// Lambda function returned type is implicit
+val hello:(String)=>Unit = (name:String) => {
+  println("Hello "+name)
+}
+
+def def_hello:(String)=>Unit = (name:String) => {
+  println("Hello "+name)
+}
+// You are writing JavaScript NOW!!!! (ES6 later)
+----
+
+== Multiple main
+
+.Multiple main code
+[source,scala]
+----
+object SayHello {
+  def hello(msg:String): Unit = 
+    println("Hello world!")
+    println(msg)
+  def main(args:Array[String]): Unit = {
+    def msg = "I was compiled by Scala 3. :)"
+
+    hello(msg)
+  }
+}
+
+// Compiler will wrap a class within it
+@main def hello: Unit = 
+    println("Hello world!")
+    println(msg)
+def msg = "I was compiled by Scala 3. :)"
+//End
+----
+
+.Compiler Output
+----
+[info] welcome to sbt 1.5.5 (Oracle Corporation Java 16.0.1)
+[info] loading project definition from C:\Users\cross\Desktop\Scala\new_demo\project
+[info] loading settings for project root from build.sbt ...
+[info] set current project to scala3-simple (in build file:/C:/Users/cross/Desktop/Scala/new_demo/)
+[info] compiling 1 Scala source to C:\Users\cross\Desktop\Scala\new_demo\target\scala-3.0.1\classes ...
+
+Multiple main classes detected. Select one to run:
+ [1] SayHello
+ [2] hello
+
+Enter number: 2
+[info] running hello
+Hello world!
+I was compiled by Scala 3. :)
+----
+
+
+
+== Links
+- https://stackoverflow.com/questions/49706714/curly-braces-in-scala-method-call[Curly braces in Scala method call]
+- https://ammonite.io/[Ammonite]
+- https://docs.scala-lang.org/overviews/scala-book/hello-world-1.html
+- https://stackoverflow.com/questions/18887264/what-is-the-difference-between-def-and-val-to-define-a-function
+- https://docs.scala-lang.org/style/method-invocation.html
+- https://docs.scala-lang.org/scala3/new-in-scala3.html
+
+= Others
+https://docs.scala-lang.org/scala3/book/taste-control-structures.html[CONTROL STRUCTURES]
+
+.Start with the Weird Object
+[source,scala]
+----
+object Hello {
+  def msg = "I was compiled by Scala 3. :)"
+  def hello(): Unit = 
+    println("Hello world!")
+    println(msg)
+  def main(args:Array[String]) = {
+    hello()
+    println("Surprise!")
+  }
+  println("I'm Outside of the world, I'm the first one to be execute! ")
+}
+----
+
+== Function with/without parenthesis
+- https://www.scala-lang.org/api/2.13.3/scala/collection/immutable/Range$$Inclusive.html
+- https://stackoverflow.com/questions/7409502/what-is-the-difference-between-def-foo-and-def-foo-in-scala
+[source,scala]
+----
+def hello() 
+hello 
+// [error] method hello in object Hello must be called with () argument 
+
+def hello
+hello()
+// [error] method hello in object Hello does not take parameters 
+
+// def hello and call hello is okay
+// def hello() and call hello() is okay as well
+
+// How do we separate method and property? 
+
+(1 to 10).toList()
+// missing argument for parameter n of method apply in trait LinearSeqOps: (n: Int): Int
+(1 to 10).toList
+// val res5: List[Int] = List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+
+('a' to 'd').toList
+// val res8: List[Char] = List(a, b, c, d) 
+// It's a good iterator
+// Actually, it's just an ascii convertor
+----
+
+== Indentation
+- https://docs.scala-lang.org/scala3/reference/other-new-features/indentation.html
+
+== Control Flow
+- https://docs.scala-lang.org/scala3/reference/other-new-features/indentation.html
+- https://docs.scala-lang.org/scala3/book/taste-control-structures.html
+
+[source,scala]
+
+=== for loop
+.Scala 2 C style
+[source,scala]
+----
+for (i <- 1 to 10 if (i > 5) ) {println(i)}
+----
+
+.Scala 3 omit brace and parenthesis
+[source,scala]
+----
+for i <- 1 to 10 if i > 5 do println(i)
+----
+
+=== if statement in a expression
+.Scala 3 one line
+[source,scala]
+----
+val greater = if 5>10 || 1+1==2  then 50 else 30 //omit () and add "then" keyword
+val greater = if (5>10 || 1+1==2) 50 else 30 // scala 2 you can't omit () 
+----
+That's amazing. Here's a longer version
+[source,scala]
+----
+val greater = (()=>{
+  if (5>10 || 1+1==2){
+    50 
+    // You can't return it explicitly
+    // return outside method definition
+  } else {
+    30
+  }
+}) ()
+----
+Surprisingly, the similarity between Javascript and Scala is small in this expression. 
+
+[source,javascript]
+----
+// you have to put you function in parenthesis, don't forget add parenthesis at last! 
+const greater = (()=>{
+  if (5>10 || 1+1==2){
+    return 50
+  } else {
+    return 30
+  }
+}) ()
+greater // and you have to call it to assign value the value (evaluate it) lazy evaluation? 
+----
+
+But it's surprisingly natural in lisp (clojure)
+[source,clojure]
+----
+(def greater (if (or (> 5 10) (= (+ 1 1) 2)) 50 30))
+----
+
+.test if a number (10) is an even
+[source,scala]
+-----
+var test = ((i:Int) => i%2 == 0)(10) //true
+-----
+=== Try/catch
+[source,scala]
+----
+def toInt(str:String):Int={
+  try{
+    str.toInt
+  }catch{
+    // The last case _ is a “catch all” case for any other possible Int values. Cases are also called alternatives.
+    // The default parameter is err already. 
+    // err match { case ...}
+    case _ : Throwable => 0
+  }
+}
+----
+
+=== Loop for/yield
+
+https://stackoverflow.com/questions/50398630/what-is-the-use-of-yield-in-scala-over-map
+
+for each member of seq(list), return the expression of yield, and then put it back. Basically it's a map. 
+
+.for/yield in scala
+[source,scala]
+----
+scala> for (i <- 1 to 5) yield i
+// res0: scala.collection.immutable.IndexedSeq[Int] = Vector(1, 2, 3, 4, 5)
+scala> for (i <- 1 to 5) yield i * 2
+// res1: scala.collection.immutable.IndexedSeq[Int] = Vector(2, 4, 6, 8, 10)
+
+// some functions in yield
+def my_int_map[A](f:(Int)=>A,seq:Seq[Int]):Seq[A] = {
+  for x <- seq yield f(x)
+}
+def my_generic_map[A,B](f:(B)=>A,seq:Seq[B]):Seq[A] = {
+  for x <- seq yield f(x)
+}
+def my_generic_filter[A,B](f:(B)=>Boolean,seq:Seq[B]):Seq[B] = {
+  for x <- seq if f(x) == true yield x
+}
+def filter_and_map[A,B](f_filter:(B)=>Boolean,f_map:(B)=>A,seq:Seq[B]) = {
+  for x <- seq if f_filter(x) == true yield f_map(x)
+}
+
+// scala> filter_and_map((_:Int) > 2, (_:Int) * 2, List(-1,-2,-3,5,3,2))
+// val res1: Seq[Int] = List(10, 6)
+----
+
+
+== Anonymous function
+You must *ANNOTATE* THE TYPE of low dash (input parameter)
+
+.like clojure
+[source,scala]
+----
+filter_and_map((_:Int) > 2, (_:Int) * 2, List(-1,-2,-3,5,3,2))
+----
+
+.like javascript (arrow function)
+[source,scala]
+----
+filter_and_map((x:Int)=> x > 2, (x:Int)=> x * 2, List(-1,-2,-3,5,3,2))
+----
+
+See <<Call by name>> and https://stackoverflow.com/questions/4386127/what-is-the-formal-difference-in-scala-between-braces-and-parentheses-and-when[What is the formal difference in Scala between braces and parentheses, and when should they be used?]
+
+
+.function in bracket
+[source,scala]
+----
+// def timer[A](f: => A): (A, Double)
+timer((()=>1)())
+// val res5: (Int, Double) = (1,0.01039)
+timer{1}
+// val res6: (Int, Double) = (1,8.3E-4)
+
+timer{println("fuck")}
+// fuck
+// val res8: (Unit, Double) = ((),0.04058)
+
+timer(println("fuck"))
+// fuck
+// val res9: (Unit, Double) = ((),0.03641)
+
+timer((()=>println("fuck"))())
+// fuck
+// val res10: (Unit, Double) = ((),0.04276)
+----
+
+== Omit Braces and Parenthesis
+- https://docs.scala-lang.org/scala3/reference/other-new-features/control-syntax.html
+- https://stackoverflow.com/questions/1181533/what-are-the-precise-rules-for-when-you-can-omit-parenthesis-dots-braces-f
+
+== implicit return
+- https://stackoverflow.com/questions/12560463/return-in-scala
+
+
+
+[quote]
+It's not as simple as just omitting the return keyword. In Scala, if there is no return then the last expression is taken to be the return value. So, if the last expression is what you want to return, then you can omit the return keyword. But if what you want to return is not the last expression, then Scala will not know that you wanted to return it.
+
+== Functional Programming
+FP, series of expressions; Expression-Oriented Programming. (EOP)
+
+[source,java]
+-----
+order.calculateTax()
+order.updatePrices()
+-----
+
+They are statements because they don't have a return value. only executed for their side effects. 
+
+
+[source,scala]
+-----
+val tax = calculateTax(order)
+val price = calculatePrice(order)
+-----
+=== Unix Pipe
+Writing FP as being lick writing Unix pipeline commands.
+
+- Data stays at rest unless moved by a process
+- Processes cannot consume or create data
+- Must have a least one input data flow 
+- Must have at least one output data flow
+
+> avoiding black holes and miracles
+
+=== Function composition
+[source,scala]
+----
+def combine[A,B,C] (f1: A=>B, f2: B=>C): A => C = f1 andThen f2
+----
+
+https://clojuredocs.org/clojure.core/comp
+
+=== Identity function
+[source,scala]
+----
+def identity[A] (f: A) = f
+----
+
+=== List and recursion
+- https://stackoverflow.com/questions/41346590/lists-in-scala-plus-colon-vs-double-colon-vs
+- https://www.scala-lang.org/api/current/scala/collection/immutable/List.html#+:(elem:A):List[A]
+- https://clojuredocs.org/clojure.core/rest
+
+.The custom sum function
+[source,scala]
+----
+// val test = 1 :: 2 :: 3 :: Nil
+// test.head == 1
+// test.tail == List(2,3)
+def sum_recursion(list: List[Int]): Int = {
+  // the sum of a list is the sum of the head elem + the sum of the tail elems
+
+  // pattern matching is popular in recursion
+
+  // Nil == List() (empty List)
+  list match
+    case Nil => 0
+    // case List() => 0
+    case head :: tail => head + sum_recursion(tail)
+    // case x :: xs => x + sum(xs) is more commonly used
+    // x is for one instance and xs stand for more x! 
+    // this patten matching is just like 
+    // rest in clojure
+}
+----
+
+[source,clojure]
+----
+(defn sum_recursion
+  "it's a recursion version of sum"
+  [list]
+  (case list
+    [] 0
+    ;; the default behavior is no test condition
+    ;; which is different from (cond)
+    ;; which uses :else keyword
+    (+ (first list) (sum_recursion (rest list)))))
+
+;; a clear way to use let
+(defn sum_recursion
+  "it's a recursion version of sum"
+  [list]
+  (let [x (first list)
+        xs (rest list)]
+  ;; maybe
+  ;; (let [ [x & xs] list ] ...)
+  (case list
+    [] 0
+    (+ x (sum_recursion xs)))))
+----
+=== Tail recursion
+[source,scala]
+----
+// code won't compile unless it's a tail recursion
+// Cannot rewrite recursive call: it is not in tail position
+@tailrec
+def sum_acc(list: List[Int],acc:Int): Int = {
+  list match
+    case Nil => 0
+    case x :: xs => sum_acc(xs, acc + x)
+}
+// use this as public api
+// "0" in here just a "seed" value
+def sum_tail_recursion(list: List[Int]): Int = sum_acc(list, 0)
+----
+
+.Alias for prepended (add (something) to the beginning of something else)
+[source,scala]
+----
+final def +:[B >: A](elem: B): List[B]
+----
+
+.Alias for prepended
+[source,scala]
+----
+final def +:[B >: A](elem: B): List[B]
+----
+
+[source, scala]
+----
+val list = List(1,2,3)
+
+// list con ends with "Nil"
+val list = 1 :: 2 :: 3 :: Nil
+----
+
+== Map (hashmap) in Scala
+
+[source,scala]
+----
+val a_example_of_map = Map(
+  "a" -> 42
+)
+//equals
+val a_example_of_map_2 = Map(
+  ("a",42)
+)
+// Type is Map[String,Int]
+// of course you can be crazy
+----
+
+https://medium.com/front-end-weekly/es6-map-vs-object-what-and-when-b80621932373[ES6 — Map vs Object — What and when?]
+[source,js]
+----
+const a_example_of_map = {
+  "a" : 42
+} // Strictly, it's a Javascript Object
+----
+[source,scala]
+----
+val functions = Map(
+  ("2x",(x:Int)=>x*2),
+  ("3x",(x:Int)=>x*3)
+)
+// Type is Map[String,Int=>Int]
+// functions("3x")(9) = 27
+----
+
+== def is not val
+
+[source,scala]
+----
+def triple(x:Int)=x*3
+val x3 = (x:Int) = x*3
+----
+
+== Polymorphism
+
+[source,scala]
+----
+object StringTools {
+  def toHexStr (num:Int) = {
+    "%02x".formatted(num)
+  }
+  def toHexStr (str:String):Array[String] = {
+    str.getBytes().map(num=>if(num < 0xff) "%02x".formatted(num) else "ff")
+  }
+  def toHexStr (coll:Seq[Int]):Seq[String] = {
+    coll.map(num=>if(num < 0xff) "%02x".formatted(num) else "ff")
+  }
+  def calculateNmeaChecksum (str:String):Int = {
+    str.getBytes().reduce((x:Byte,y:Byte)=>(x^y).toByte).toInt
+  }
+  def main(args:Array[String]) = {
+    val msg = "GPDTM,W84,,0.0,N,0.0,E,0.0,W84"
+    println(toHexStr(calculateNmeaChecksum(msg)))
+  }
+}
+----
+
+.clojure version (multimethod)
+[source,clojure]
+----
+;; NMEA checksum
+;; no star, no dollar sign, sum all the character between
+(def msg "$GPDTM,W84,,0.0,N,0.0,E,0.0,W84*6F")
+(def msg_nocs "GPDTM,W84,,0.0,N,0.0,E,0.0,W84")
+
+(def msg_no_checksum (drop 1 (drop-last 3 (.getBytes msg))))
+(apply str (map #(char %) msg_no_checksum))
+
+;; you can use keywords as well
+;; that's :number, :coll, :string
+;; However it's not clojure standard
+(defn is_what
+  "know what the type of x is"
+  [x](cond
+       (number? x) :number
+       (coll? x) :coll
+       (string? x) :string
+       :else :error))
+(defmulti toHexStr is_what)
+(defmethod toHexStr :string
+  [str] (map #(format "%02x" %) (.getBytes str)))
+(defmethod toHexStr :number
+  [num] (format "%02x" num))
+(defmethod toHexStr :coll
+  [collection] (map #(format "%02x" %) collection))
+
+(toHexStr 64)
+(toHexStr "number")
+(toHexStr [99,31,89])
+
+;; cal checksum
+(defn calChecksum
+  "cal checksum from bytes"
+  ;; [bytes](let[total (reduce + bytes)] (+ (bit-and 0xff total) (bit-shift-right total 8)))
+  [bytes] (let [total (reduce bit-xor bytes)] (bit-and 0xff total)))
+----
+.clojure function overload
+[source,clojure]
+----
+(defn my_waifu
+  "When you want to greet someone and introduce your waifus
+   you can use this function. "
+  ([name] (str "Hi " name "."))
+  ([name & my_rest_waifu]
+   (str "Hi " name ". Here "
+        (if (single? my_rest_waifu)
+          (str "is my waifu " (last my_rest_waifu) ". ")
+          (str "are my waifus " (clojure.string/join ", " (drop-last my_rest_waifu)) " and " (last my_rest_waifu) ". ")
+      ;;  (str (apply str (map (fn [waifu] (str waifu ", ")) (drop-last my_rest_waifu))) " and " (last my_rest_waifu) ". ")
+          ))))
+(my_waifu "tanaka" "fubuki" "sendai" "Akibahara" "nobody knowing what she called")
+(my_waifu "tanaka")
+(my_waifu "tanaka" "fubuki")
+----
+
+== Generic
+https://docs.scala-lang.org/tour/polymorphic-methods.html
+
+See examples in <<Loop for/yield>>
+
+== Call by name
+
+- https://en.wikipedia.org/wiki/Evaluation_strategy
+- https://docs.scala-lang.org/tour/by-name-parameters.html[By-name parameters]
+- https://stackoverflow.com/questions/4543228/whats-the-difference-between-and-unit
+
+By-name parameters are evaluated every time they are used. They won’t be evaluated at all if they are unused.
+
+https://stackoverflow.com/questions/28876368/scala-by-name-parameter-on-a-anonymous-function
+
+I want a timer like this 
+[source,scala]
+----
+val time = (result,time) = timer(some_function:(I_DON_KNOW_INPUT_TYPE):DON_KNOW_RETURN_TYPE_AS_WELL)
+----
+How can I achieve this? 
+[source,scala]
+----
+// Notice f:=>A is not legal. It's "f: => A" with a space
+// You can say
+// def timer[A] = (f: => A) => {...}
+// like JavaScript
+//// You just can't
+// an identifier expected, but '=>' found
+// Actually you can
+
+// def timer[A](f: => A): (A, Double) = {
+def timer[A]: (=> A) => (A,Double) = (f) => {
+  val startTime = System.nanoTime
+  val result = f
+  val stopTime = System.nanoTime
+  val delta = stopTime - startTime
+  // return (result,delta/1E7)
+  return (result,delta/1E7)
+}
+----
+
+== Return multiple items
+See <<Call by name>>, use tuple
+
+The return signature is `(OutputType1,OutputType2,...)`
+
+== Parameter group
+https://en.wikipedia.org/wiki/Currying[Currying]
+
+[source,scala]
+----
+def add (a:Int)(b:Int)(c:Int) = a + b + c
+def add (a:Int,b:Int,c:Int) = a + b + c
+----
+=== Currying
+[source,scala]
+----
+def f2(a: Int,b: Int) = a + b
+
+def curried_f2 = (f2 _).currie
+//equals 
+def curried_f2(a: Int)(b: Int) = a + b
+// def curried_f2: Int => Int => Int
+
+def wrap (prefix:String, middle:String, suffix:String) = prefix + html + suffix
+def wrap_div = wrap("<div>", _:String, "/dev") // low dash:Type is usable in normal function and curried function
+wrap("Hello World")
+----
+
+https://docs.scala-lang.org/tour/by-name-parameters.html[a custom while loop with by-name parameters]
+
+.a custom while loop
+[source,scala]
+----
+def my_while(f_test: => Boolean) (f_do: => Unit):Unit = {
+  if (f_test == true){
+    f_do
+    my_while(f_test)(f_do) // recursion is just like JUMP in assembly? 
+  }
+}
+----
+== implicit parameter/value
+When you need to refer to a shared resource serval times. 
+
+[source,scala]
+----
+implicit val b = true
+----
+
+== Default value
+[source,scala]
+----
+def f2 (a:Int = 0, b:Int = 0) = a + b
+def f3(a:Int = 0)(b:Int = 0) = a + b
+// the second para can refer to the first one
+def f4(a:Int = 0)(b:Int = a) = a + b
+----
+
+
+== Bind
+Rebinding doesn’t mutate the existing memory location. It reserves new memory and reassigns the symbolic name to the new location.
+
+You should always keep in mind that data is immutable. Once a memory location is occupied with data, it can’t be modified until it’s released. But variables can be rebound, which makes them point to a different memory location. Thus, variables are mutable, but the data they point to is immutable.
+
+If a function has no arguments, you can omit the parentheses in Elixir
+
+Elixir comes with a built-in operator, `|>`, called the _pipeline operator_
+
+= Terminology
+- FIP function input parameter
+- PAF partially applied function

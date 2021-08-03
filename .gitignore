@@ -1,0 +1,5 @@
+*.log
+target
+.vscode
+.metals
+~$*
