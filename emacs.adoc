@@ -83,9 +83,14 @@ I have totally no idea what these code means.
 ./autogen.sh
 ./configure --with-json --with-modules --with-harfbuzz --with-compress-install \
             --with-threads --with-included-regex --with-zlib --with-cairo --with-rsvg\
-            --without-sound --without-imagemagick  --with-toolkit-scroll-bars \
+            # WSLg supports sound, so you can turn it on. 
+            --without-sound \
+            --without-imagemagick  --with-toolkit-scroll-bars \
             --with-gpm --with-dbus  --with-pop \
-            --with-mailutils --without-gsettings --with-native-compilation
+            --with-mailutils \
+            # If you use Gnome you should turn it on
+            --without-gsettings \
+            --with-native-compilation
 make NATIVE_FULL_AOT=1 -j$(nproc)
 sudo checkinstall -y -D --pkgname=emacs28-nativecomp --pkgversion=1$(git rev-parse --short HEAD) \
      --requires="libjansson-dev,libharfbuzz-dev,libgccjit-10-dev" --pkggroup=emacs --gzman=yes \
@@ -118,3 +123,83 @@ fc-list | grep "Sarasa"
 The latest version of Windows has implemented a GUI distro layer. So a X server is no longer needed. 
 
 But the border is really ugly. See the issue https://github.com/microsoft/wslg/issues/37[Default window decorations color · Issue #37 · microsoft/wslg]
+
+You can turn it `WSLg` off
+
+> Users wanting to use different servers than the one provided by WSLg can change these environment variables. User can also choose to turn off the system distro entirely by adding the following entry in their `.wslconfig` file (located at `c:\users\MyUser\.wslconfig`). This will turn off support for GUI applications in WSL.
+
+#### The border
+
+- https://github.com/microsoft/wslg/issues/37[Default window decorations color · Issue #37 · microsoft/wslg]
+- https://www.reddit.com/r/emacs/comments/b2r2oj/is_it_possible_to_disable_or_hide_the_titlebar_in/[Is it possible to disable or hide the titlebar in Emacs but still be able resize with the mouse? : emacs]
+
+
+
+
+
+
+Just hide it by
+
+```elisp
+  ;; Scroll bar behaviour is in 
+  ;; dotspacemacs-smooth-scrolling 
+  ;; dotspacemacs-scroll-bar-while-scrolling 
+  (menu-bar-mode 1)
+  (setq default-frame-alist '((undecorated . t)))
+  (add-to-list 'default-frame-alist '(drag-internal-border . 1))
+  (add-to-list 'default-frame-alist '(internal-border-width . 5))
+```
+#### Copy and Paste
+- https://github.com/microsoft/wslg/issues/15[Cannot copy text *into* Kate editor, copying text *from* Kate works fine. · Issue #15 · microsoft/wslg]
+- https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-clipboard?view=powershell-7.1[Get-Clipboard (Microsoft.PowerShell.Management) - PowerShell | Microsoft Docs]
+
+````lisp
+  ; wsl-copy
+  (defun wsl-copy (start end)
+    (interactive "r")
+    (shell-command-on-region start end "clip.exe")
+    (deactivate-mark))
+
+  (defun wsl-copy-string (str)
+     ;;avoid using this function. it's kind of bug. 
+    (async-shell-command (format "echo '%s' | clip.exe" str)))
+    ;; (shell-command-to-string (format "echo '%s' | clip.exe" str)))
+
+
+  (defun wsl-get-clipboard ()
+    "return a string from wsl clipboard"
+    (let ((clipboard
+           (shell-command-to-string "powershell.exe -command 'Get-Clipboard' 2> /dev/null")))
+      (setq clipboard (replace-regexp-in-string "\r" "" clipboard)) ; Remove Windows ^M characters
+      (setq clipboard (substring clipboard 0 -1)) ; Remove newline added by Powershell
+  ))
+
+  (defun wsl-paste-insert ()
+    (interactive)
+    (insert (wsl-get-clipboard)))
+
+  (defun wsl-paste-replace (beg end)
+    (interactive "r")
+    (replace-region-contents beg end 'wsl-get-clipboard))
+
+  (defun wsl-set-evil-c-register ()
+    " Set evil register with a value from wsl clipboard
+      a character is a question mark '?' following a char according to
+      https://www.gnu.org/software/emacs/manual/html_node/elisp/Basic-Char-Syntax.html"
+    (interactive)
+    (evil-set-register ?c (wsl-get-clipboard)))
+
+  (defun wsl-read-evil-c-register ()
+    " Write the contents of c rigister to clipboard
+      a character is a question mark '?' following a char according to
+      https://www.gnu.org/software/emacs/manual/html_node/elisp/Basic-Char-Syntax.html"
+    (interactive)
+    (wsl-copy-string (evil-get-register ?c)))
+
+  ;; (require 'cl-generic)
+
+  (define-key evil-insert-state-map (kbd "C-v") 'wsl-paste-insert)
+  (define-key evil-visual-state-map (kbd "C-v") 'wsl-paste-replace)
+  (define-key evil-visual-state-map (kbd "C-c") 'wsl-copy)
+````
+
