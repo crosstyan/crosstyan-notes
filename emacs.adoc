@@ -133,11 +133,6 @@ You can turn it `WSLg` off
 - https://github.com/microsoft/wslg/issues/37[Default window decorations color · Issue #37 · microsoft/wslg]
 - https://www.reddit.com/r/emacs/comments/b2r2oj/is_it_possible_to_disable_or_hide_the_titlebar_in/[Is it possible to disable or hide the titlebar in Emacs but still be able resize with the mouse? : emacs]
 
-
-
-
-
-
 Just hide it by
 
 ```elisp
