@@ -135,7 +135,8 @@ You can turn it `WSLg` off
 
 Just hide it by
 
-```elisp
+[source,elisp]
+----
   ;; Scroll bar behaviour is in 
   ;; dotspacemacs-smooth-scrolling 
   ;; dotspacemacs-scroll-bar-while-scrolling 
@@ -143,12 +144,14 @@ Just hide it by
   (setq default-frame-alist '((undecorated . t)))
   (add-to-list 'default-frame-alist '(drag-internal-border . 1))
   (add-to-list 'default-frame-alist '(internal-border-width . 5))
-```
+----
+
 #### Copy and Paste
 - https://github.com/microsoft/wslg/issues/15[Cannot copy text *into* Kate editor, copying text *from* Kate works fine. · Issue #15 · microsoft/wslg]
 - https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-clipboard?view=powershell-7.1[Get-Clipboard (Microsoft.PowerShell.Management) - PowerShell | Microsoft Docs]
 
-````lisp
+[source,elisp]
+----
   ; wsl-copy
   (defun wsl-copy (start end)
     (interactive "r")
@@ -159,7 +162,6 @@ Just hide it by
      ;;avoid using this function. it's kind of bug. 
     (async-shell-command (format "echo '%s' | clip.exe" str)))
     ;; (shell-command-to-string (format "echo '%s' | clip.exe" str)))
-
 
   (defun wsl-get-clipboard ()
     "return a string from wsl clipboard"
@@ -196,5 +198,4 @@ Just hide it by
   (define-key evil-insert-state-map (kbd "C-v") 'wsl-paste-insert)
   (define-key evil-visual-state-map (kbd "C-v") 'wsl-paste-replace)
   (define-key evil-visual-state-map (kbd "C-c") 'wsl-copy)
-````
-
+----
