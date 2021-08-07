@@ -1,0 +1,120 @@
+
+## Syntax in Org-mode
+
+- https://orgmode.org/worg/org-tutorials/org4beginners.html[Org mode beginning at the basics]
+- https://orgmode.org/worg/dev/org-syntax.html[Org Syntax (draft)]
+- https://orgmode.org/worg/org-tutorials/index.html[Org tutorials]
+- https://hyperpolyglot.org/lightweight-markup[Lightweight Markup: Markdown, reStructuredText, MediaWiki, AsciiDoc, Org-mode - Hyperpolyglot]
+
+## Tutorial
+- http://ergoemacs.org/index.html[Xah Emacs Site]
+- https://github.com/redguardtoo/mastering-emacs-in-one-year-guide/blob/master/guide-zh.org[mastering-emacs-in-one-year-guide/guide-zh.org at master · redguardtoo/mastering-emacs-in-one-year-guide]
+- https://book.emacs-china.org/[Master Emacs in 21 Days]
+- https://emacstalk.github.io/podcast/005/[005. 与 Emacs 高手陈斌闲聊 Emacs – EmacsTalk]
+
+## Install in WSL
+- https://github.com/hubisan/emacs-wsl[hubisan/emacs-wsl: Install and run Emacs with the Windows Subsystem for Linux (WSL) in Windows 10.]
+- https://gist.github.com/kiennq/0f3e65098725b1f9708da8c92972e705[Build emacs-snapshot on Ubuntu 18.04]
+- https://emacsredux.com/blog/2020/09/23/using-emacs-on-windows-with-wsl2/[Using Emacs on Windows with WSL2 | Emacs Redux]
+- https://www.emacswiki.org/emacs/GccEmacs[Gcc Emacs]
+- https://elecming.medium.com/the-ultimate-emacs-hacking-tutorial-in-windows-10-wsl-2-2fc4e9a899b0[The Ultimate Emacs Hacking Tutorial in Windows 10 WSL 2]
+- https://mobaxterm.mobatek.net/[MobaXterm free Xserver and tabbed SSH client for Windows]
+- https://steinslab.io/archives/2082[使用 WSL2 + X11 转发 - 在 Windows10 中打造 GNU/Linux 学习生产环境 - Steins;Lab]
+- https://docs.microsoft.com/en-us/windows/wsl/tutorials/gui-apps[Run Linux GUI apps with WSL | Microsoft Docs]
+- https://www.youtube.com/watch?v=kC3eWRPzeWw[WSL: Run Linux GUI Apps - YouTube]
+- 
+
+### Install Compile Dependency
+
+I have totally no idea what these dependency means. 
+
+[source,bash]
+----
+sudo apt update
+sudo apt install -y autoconf automake bsd-mailx dbus-x11 debhelper dpkg-dev \
+    libacl1-dev libasound2-dev libdbus-1-dev libgif-dev libgnutls28-dev libgpm-dev \
+    libgtk-3-dev libjansson-dev libjpeg-dev liblcms2-dev liblockfile-dev libm17n-dev \
+    libncurses5-dev liboss4-salsa2 libotf-dev libpng-dev librsvg2-dev \
+    libselinux1-dev libsystemd-dev libtiff-dev libxml2-dev libxpm-dev procps quilt \
+    sharutils texinfo zlib1g-dev gvfs language-pack-en-base libasound2 libaspell15 \
+    libasyncns0 libatk-bridge2.0-0 libatk1.0-0 libatspi2.0-0 libbrotli1 \
+    libcairo-gobject2 libcairo2 libcanberra-gtk3-0 libcanberra-gtk3-module \
+    libcanberra0 libcroco3 libdatrie1 libdb5.3 libdrm2 libegl1 libenchant1c2a \
+    libepoxy0 libflac8 libfontconfig1 libfreetype6 libgbm1 libgdk-pixbuf2.0-0 \
+    libgif7 libgl1 libglvnd0 libglx0 libgpm2 libgraphite2-3 libgstreamer-gl1.0-0 \
+    libgstreamer-plugins-base1.0-0 libgstreamer1.0-0 libgtk-3-0 libgudev-1.0-0 \
+    libharfbuzz-icu0 libharfbuzz0b libhyphen0 libice6 libicu66 libjansson4 \
+    libjavascriptcoregtk-4.0-18 libjbig0 libjpeg-turbo8 liblcms2-2 liblockfile1 \
+    libltdl7 libm17n-0 libnotify4 libnss-mdns libnss-myhostname libnss-systemd \
+    libogg0 liborc-0.4-0 libotf0 libpango-1.0-0 libpangocairo-1.0-0 \
+    libpangoft2-1.0-0 libpixman-1-0 libpng16-16 libpulse0 librsvg2-2 libsasl2-2 \
+    libsecret-1-0 libsm6 libsndfile1 libsoup2.4-1 libssl1.1 libstdc++6 libtdb1 \
+    libthai0 libtiff5 libvorbis0a libvorbisenc2 libvorbisfile3 libwayland-client0 \
+    libwayland-cursor0 libwayland-egl1 libwayland-server0 libwebp6 libwebpdemux2 \
+    libwoff1 libx11-6 libx11-xcb1 libxau6 libxcb-render0 libxcb-shm0 libxcb1 \
+    libxcomposite1 libxcursor1 libxdamage1 libxdmcp6 libxext6 libxfixes3 libxi6 \
+    libxinerama1 libxkbcommon0 libxml2 libxpm4 libxrandr2 libxrender1 libxslt1.1 \
+    libyajl2
+
+sudo add-apt-repository -y ppa:ubuntu-toolchain-r/ppa
+sudo apt install -y autoconf make checkinstall texinfo libxpm-dev libjpeg-dev \
+     libgif-dev libtiff-dev libpng-dev libgnutls28-dev libncurses5-dev \
+     libjansson-dev libharfbuzz-dev libgccjit-10-dev gcc-10 g++-10
+sudo apt update
+sudo apt -y upgrade
+
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 10
+sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 10
+----
+### Clone Emacs
+[source,bash]
+----
+git clone -b master --single-branch --depth=1 https://github.com/emacs-mirror/emacs.git
+cd emacs/
+# Always install the latest version
+git fetch origin master
+----
+### Compile
+
+I have totally no idea what these code means. 
+
+[source,bash]
+----
+./autogen.sh
+./configure --with-json --with-modules --with-harfbuzz --with-compress-install \
+            --with-threads --with-included-regex --with-zlib --with-cairo --with-rsvg\
+            --without-sound --without-imagemagick  --with-toolkit-scroll-bars \
+            --with-gpm --with-dbus  --with-pop \
+            --with-mailutils --without-gsettings --with-native-compilation
+make NATIVE_FULL_AOT=1 -j$(nproc)
+sudo checkinstall -y -D --pkgname=emacs28-nativecomp --pkgversion=1$(git rev-parse --short HEAD) \
+     --requires="libjansson-dev,libharfbuzz-dev,libgccjit-10-dev" --pkggroup=emacs --gzman=yes \
+     make install-strip
+----
+
+### Install Fonts
+
+https://medium.com/source-words/how-to-manually-install-update-and-uninstall-fonts-on-linux-a8d09a3853b0[How to Manually Install, Update, and Uninstall Fonts on Linux | by Chris Simpkins | Source Words | Medium]
+
+[source,bash]
+----
+sudo apt install p7zip-full fonts-cascadia-code
+sudo apt install p7zip-full
+mkdir sarasa
+cd sarasa
+wget https://github.com/be5invis/Sarasa-Gothic/releases/download/v0.34.1/sarasa-gothic-ttf-0.34.1.7z
+7z e sarasa-gothic-ttf-0.34.1.7z
+# if there's no fonts, mkdir
+mv *.ttf ~/.local/share/fonts
+fc-cache -f -v
+fc-list | grep "Sarasa"
+----
+
+### X Server
+
+- https://github.com/microsoft/wslg[microsoft/wslg: Enabling the Windows Subsystem for Linux to include support for Wayland and X server related scenarios]
+- https://www.zhihu.com/question/455956831[如何看待 Windows 10 Build 21364 支持直接在 WSL2 中运行 GUI 应用？ - 知乎]
+
+The latest version of Windows has implemented a GUI distro layer. So a X server is no longer needed. 
+
+But the border is really ugly. See the issue https://github.com/microsoft/wslg/issues/37[Default window decorations color · Issue #37 · microsoft/wslg]

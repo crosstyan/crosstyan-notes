@@ -1,4 +1,5 @@
 = Hello World Scala
+:toc:
 
 == Normal Way
 Just like Java the old days. Although I hate Java. 
@@ -164,6 +165,16 @@ hello()
 [source,scala]
 
 === for loop
+[source,scala]
+----
+1 to 10
+//  [1,10]:Domain
+1 until 10
+//  [1,10):Domain => [1,9]:Domain
+1 to 10 by 2
+// Range(1, 3, 5, 7, 9)
+----
+
 .Scala 2 C style
 [source,scala]
 ----
@@ -237,11 +248,196 @@ def toInt(str:String):Int={
 }
 ----
 
-=== Loop for/yield
+=== Comprehension for/yield
 
-https://stackoverflow.com/questions/50398630/what-is-the-use-of-yield-in-scala-over-map
+Someone call it for Expression. 
 
-for each member of seq(list), return the expression of yield, and then put it back. Basically it's a map. 
+- https://stackoverflow.com/questions/50398630/what-is-the-use-of-yield-in-scala-over-map
+- https://docs.scala-lang.org/tour/for-comprehensions.html
+- https://www.scala-lang.org/old/node/111
+- https://zh.wikipedia.org/wiki/%E5%88%97%E8%A1%A8%E6%8E%A8%E5%AF%BC%E5%BC%8F
+- https://zhuanlan.zhihu.com/p/28274410
+- https://brilliant.org/wiki/list-comprehension/
+- https://en.wikipedia.org/wiki/List_comprehension
+- https://stackoverflow.com/questions/9061760/how-to-read-aloud-python-list-comprehensions
+
+> “list comprehension”没有统一的中文译法。有译作列表解析式、列表生成式、列表构建、列表理解等。
+
+> I initially called these ZF expressions, a reference to Zermelo-Frankel set theory — it was Phil Wadler who coined the better term list comprehension.
+
+> A list comprehension is a construct available in some computer programming languages that allows the creation of lists from other lists. It uses set building notation to allow this functionality in an intuitive and elegant way.
+
+> List comprehensions are a way to filter, transform, and combine lists. They're very similar to the mathematical concept of "set comprehensions". Set comprehensions are normally used for building sets out of other sets. 
+
+
+还是用英文 list comprehension 比较好, 我觉得「列表解析」听起来也顺耳一点. 
+
+for each member of seq(list), return the expression of yield, and then put it back. Basically it's a `map`. 
+
+> A series of method calls that may include `map`, `flatMap`, `foreach` and `withFilter`
+
+[source,scala]
+----
+abstract class CustomClass[A]{
+  def map[B](f:A => B): CustomClass[B]
+  def flatMap[B](f: A => CustomClass[B]): CustomClass[B]
+  def withFilter(p: A => Boolean): CustomClass[A]
+  def foreach(b: A => Unit): Unit // forEach is not a pure function
+  // it doesn't return any value
+}
+----
+
+.list comprehension in python
+[source, python]
+----
+# I don't think we have definition in python
+# one line python
+num_list = [y for y in range(100) if y % 2 == 0 if y % 5 == 0]
+
+# you can use multiple lines here
+num_list = [y # yield (or return)
+              for y in range(100) # generator
+              if y % 2 == 0 # definition
+              if y % 5 == 0 # definition
+            ]
+----
+
+.list comprehension in scala
+[source,scala]
+----
+val num_list = for {
+  y <- 0 to 100
+  if (y % 2 == 0)
+  if (y % 5 == 0)
+} yield y
+----
+
+==== Generators, filters and definitions
+
+.list comprehension in scala
+[source,scala]
+----
+for {
+  p <- persons // Generator
+  n = p.name // Definition
+  if (n startsWith "To") // Filter
+} yield
+----
+
+===== Generators
+[source,scala]
+----
+  p <- persons // Generator
+----
+Every `for` comprehension begins with a generator, and can have multiple generators. 
+
+==== Multiple Generator
+Need `flatMap` function
+
+把列表的列表弄平了 (拆分成最小的不可分元素, 然后碾平)
+
+.map and flatMap
+[source,scala]
+----
+def map[B](f:A => B): CustomClass[B]
+Seq("apple","banana","orange").map(_.toUpperCase)
+// Return
+// 常识告诉我, 字符串是字符的列表
+List(APPLE, BANANA, ORANGE)
+
+def flatMap[B](f: A => CustomClass[B]): CustomClass[B]
+Seq("apple","banana","orange").flatMap(_.toUpperCase)
+// Return
+List(A, P, P, L, E, B, A, N, A, N, A, O, R, A, N, G, E)
+
+// The explain here is the return of function, which is the param of map/flatMap is differen
+// How? What I pass is the same function
+// flatten -- converts a "list of lists" to a single list. 
+----
+
+.multiple generator
+[source,scala]
+----
+for { 
+    y <- 0 to 10 // [0,10]:Domain
+    x <- 11 to 20 by 2 // [11,13,15,17,19]
+  } yield y
+// Return
+Vector( 0, 0, 0, 0, 0,
+        1, 1, 1, 1, 1,
+        2, 2, 2, 2, 2,
+        ........
+        10, 10, 10, 10, 10)
+
+for { 
+    x <- 11 to 20 by 2 // [11,13,15,17,19]
+    y <- 0 to 10 // [0,10]:Domain
+  } yield y
+Vector( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 )
+
+for { 
+      y <- 0 to 10 // [0,10]:Domain
+      x <- 11 to 20 by 2 // [11,13,15,17,19]
+    } yield x
+Vector( 11, 13, 15, 17, 19, 
+        11, 13, 15, 17, 19, 
+        11, 13, 15, 17, 19, 
+        ........
+        11, 13, 15, 17, 19 )
+
+for { 
+    x <- 11 to 20 by 2 // [11,13,15,17,19]
+    y <- 0 to 10 // [0,10]:Domain
+  } yield x
+Vector( 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+        13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13,
+        15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+        17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17,
+        19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19 ) 
+
+for {
+      y <- 0 to 10 // [0,10]:Domain
+      x <- 11 to 20 by 2 // [11,13,15,17,19]
+    } yield y * x
+Vector( 0, 0, 0, 0, 0,        // y * x = 0 * x
+        11, 13, 15, 17, 19,   // y * x = 1 * x
+        22, 26, 30, 34, 38,   // y * x = 2 * x
+        33, 39, 45, 51, 57,   // y * x = 3 * x
+        ......
+        110, 130, 150, 170, 190) // y * x = 10 * x
+
+for { 
+      x <- 11 to 20 by 2 // [0,10]:Domain
+      y <- 0 to 10 // [11,13,15,17,19]
+    } yield y * x
+Vector( 0, 11, 22, 33, 44, 55, 66, 77, 88, 99, 110,
+        0, 13, 26, 39, 52, 65, 78, 91, 104, 117, 130,
+        0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150,
+        0, 17, 34, 51, 68, 85, 102, 119, 136, 153, 170,
+        0, 19, 38, 57, 76, 95, 114, 133, 152, 171, 190 )
+----
+
+Generator(s) 的顺序极其重要. 就像一个被压扁的 `row * col` (前一个出现的 Generator 是 row, 后一个是 col) 的矩阵
+
+当然就算搞反了其实也就转置的事
+
+
+===== Filters
+[source,scala]
+----
+  if (n startsWith "To") // Filter
+----
+
+===== Definition
+[source,scala]
+----
+  n = p.name // Definition
+----
+Temp variables. 
 
 .for/yield in scala
 [source,scala]
@@ -365,8 +561,10 @@ def identity[A] (f: A) = f
 
 === List and recursion
 - https://stackoverflow.com/questions/41346590/lists-in-scala-plus-colon-vs-double-colon-vs
-- https://www.scala-lang.org/api/current/scala/collection/immutable/List.html#+:(elem:A):List[A]
+- https://www.scala-lang.org/api/current/scala/collection/immutable/List.html[List]
 - https://clojuredocs.org/clojure.core/rest
+- https://en.wikipedia.org/wiki/CAR_and_CDR
+
 
 .The custom sum function
 [source,scala]
@@ -450,6 +648,23 @@ val list = List(1,2,3)
 // list con ends with "Nil"
 val list = 1 :: 2 :: 3 :: Nil
 ----
+
+==== CAR and CDR
+- https://en.wikipedia.org/wiki/CAR_and_CDR[CAR and CDR]
+- https://www.gnu.org/software/emacs/manual/html_node/eintr/car-cdr-_0026-cons.html[Fundamental Functions]
+- https://stackoverflow.com/questions/29907440/difference-between-cdr-car-and-rest-first-and-possible-implementation[Difference between CDR, CAR and REST, FIRST and possible implementation?]
+
+> The operations `car` and `cdr` signals that you are working on a data structure build with pairs, that potentially isn't a list.
+
+The `cons` function is used to construct lists, and the `car` and `cdr` functions are used to take them apart.
+
+The `CAR` of a list is, quite simply, the **first** item in the list. 
+
+The `CDR` of a list is the **rest** of the list, that is, the cdr function returns the part of the list that follows the first item. 
+
+- car ("contents of the address part of register number"),
+- cdr ("contents of the decrement part of register number"),
+
 
 == Map (hashmap) in Scala
 
@@ -576,7 +791,7 @@ object StringTools {
 == Generic
 https://docs.scala-lang.org/tour/polymorphic-methods.html
 
-See examples in <<Loop for/yield>>
+See examples in <<Comprehension for/yield>>
 
 == Call by name
 
@@ -685,3 +900,61 @@ Elixir comes with a built-in operator, `|>`, called the _pipeline operator_
 = Terminology
 - FIP function input parameter
 - PAF partially applied function
+
+== No exception in pure function
+Function signature shouldn't tell a lie. 
+
+> Pure functions never throw exceptions
+
+> Pure function signatures are a contract with its consumers
+
+=== The Option Class
+- https://www.scala-lang.org/api/current/scala/Option.html
+- https://www.baeldung.com/scala/option-type
+- https://www.runoob.com/scala/scala-options.html
+- https://www.runoob.com/w3cnote/scala-option-some-none.html
+
+> Option 有两个子类别，Some 和 None。当程序回传 Some 的时候，代表这个函式成功地给了你一个 String，而你可以透过 get() 函数拿到那个 String，如果程序返回的是 None，则代表没有字符串可以给你。
+> 在返回 None，也就是没有 String 给你的时候，如果你还硬要调用 get() 来取得 String 的话，Scala 一样是会抛出一个 NoSuchElementException 异常给你的。 我们也可以选用另外一个方法 getOrElse。这个方法在这个 Option 是 Some 的实例时返回对应的值，而在是 None 的实例时返回传入的参数。换句话说，传入 getOrElse 的参数实际上是默认返回值。
+
+It's just `T | None`
+
+.Scala represents optional values
+[source]
+----
+          Option[T]
+            ^
+            |
+    +-------+------+
+    |              |
+    |              |
+  Some[T]        None[T]
+----
+
+=== Try, Success and Failure
+When you want to let consumers of your code know *why* something failed, use `Try` instead of `Option`
+
+=== Either, Left anad Right
+- https://colobu.com/2015/06/11/Scala-Either-Left-And-Right/
+- https://windor.gitbooks.io/beginners-guide-to-scala/content/chp7-the-either-type.html[这里面提到的设计缺陷已经被修正]
+
+- `Left` holds the error
+- `Right` holds the success value
+
+It's unbiased prior to Scala 2.12. 
+=== Or in Scalatic
+https://www.scalactic.org/user_guide/OrAndEvery
+
+=== "null" in Java
+Convert them to "None". Like the error handle above. 
+
+|===
+|Base Type | Success Case | Failure Case
+
+| Option | Some | None
+
+| Try | Success | Failure 
+| Or | Good | Bad 
+| Either | Right | Left
+
+|=== 
