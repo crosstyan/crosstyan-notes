@@ -118,13 +118,18 @@ fc-list | grep "Sarasa"
 ### X Server
 
 - https://github.com/microsoft/wslg[microsoft/wslg: Enabling the Windows Subsystem for Linux to include support for Wayland and X server related scenarios]
+
 - https://www.zhihu.com/question/455956831[如何看待 Windows 10 Build 21364 支持直接在 WSL2 中运行 GUI 应用？ - 知乎]
 
 The latest version of Windows has implemented a GUI distro layer. So a X server is no longer needed. 
 
 But the border is really ugly. See the issue https://github.com/microsoft/wslg/issues/37[Default window decorations color · Issue #37 · microsoft/wslg]
 
-You can turn it `WSLg` off
+#### Turn off WSLg
+
+- https://github.com/microsoft/wslg[microsoft/wslg: Enabling the Windows Subsystem for Linux to include support for Wayland and X server related scenarios]
+
+You can turn it `WSLg` off and use VcXsrv or XMing or MobaXTerm. 
 
 > Users wanting to use different servers than the one provided by WSLg can change these environment variables. User can also choose to turn off the system distro entirely by adding the following entry in their `.wslconfig` file (located at `c:\users\MyUser\.wslconfig`). This will turn off support for GUI applications in WSL.
 
@@ -148,28 +153,147 @@ Just hide it by
 
 #### Copy and Paste
 - https://github.com/microsoft/wslg/issues/15[Cannot copy text *into* Kate editor, copying text *from* Kate works fine. · Issue #15 · microsoft/wslg]
+- https://github.com/microsoft/wslg/issues/295[Add support for Windows clipboard shortcuts · Issue #295 · microsoft/wslg]
 - https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-clipboard?view=powershell-7.1[Get-Clipboard (Microsoft.PowerShell.Management) - PowerShell | Microsoft Docs]
+- https://www.gnu.org/software/emacs/manual/html_node/elisp/Formatting-Strings.html[Formatting-Strings]
+- https://www.gnu.org/software/emacs/manual/html_node/elisp/Output-Functions.html[https://www.gnu.org/software/emacs/manual/html_node/elisp/Output-Functions.html]
+- https://github.com/emacsmirror/xclip[emacsmirror/xclip: Copy&paste GUI clipboard from text terminal]
+- https://github.com/rolandwalker/simpleclip[rolandwalker/simpleclip: Simplified access to the system clipboard in Emacs.]
+- https://github.com/microsoft/wslg/issues/105[Neovim yank to xclip breaks wslg · Issue #105 · microsoft/wslg]
+
+>  would you please check weston.log at /mnt/wslg and do you still see massive below errors logged ? if not, would you please share weston.log captured right after the issue happened? thanks!
+
+##### Spacemacs
+
+- https://github.com/syl20bnr/spacemacs/commit/e4cb2b37dc79963c3f72e3f88f108fc4713ae65f[Add X clipboard support layer to terminal emacs. · syl20bnr/spacemacs@e4cb2b3]
+- https://develop.spacemacs.org/layers/+tools/xclipboard/README.html[xclipboard layer]
+- https://github.com/syl20bnr/spacemacs/tree/develop/layers/%2Btools/xclipboard[spacemacs/layers/+tools/xclipboard at develop · syl20bnr/spacemacs]
 
 [source,elisp]
 ----
+dotspacemacs-configuration-layers '(
+  (xclipboard
+  :variables  xclipboard-copy-command "copy.exe"
+              xclipboard-paste-command "paste.exe")
+)
+----
+
+You have to check the source code to tell what's going on here. The documentation is really bad (2021/08/08)
+
+###### Source Code
+
+.a bash shell script detect the OS we're using? Or you need to set the the variables. 
+[source,bash]
+----
+command_exists() {
+    local command=\"$1\"
+    type \"$command\" >/dev/null 2>&1
+  }
+  # Installing reattach-to-user-namespace is recommended on macOS.
+  if command_exists \"pbcopy\"; then
+      if command_exists \"reattach-to-user-namespace\"; then
+          printf \"reattach-to-user-namespace pbcopy\"
+      else
+          printf \"pbcopy\"
+      fi
+  elif command_exists \"clip.exe\"; then # WSL clipboard command
+      printf \"clip.exe\"
+  elif command_exists \"xsel\"; then
+      printf \"xsel -ib\"
+  elif command_exists \"putclip\"; then # cygwin clipboard command
+      printf \"putclip\"
+  fi
+----
+
+- https://www.gnu.org/software/emacs/manual/html_node/emacs/Clipboard.html[https://www.gnu.org/software/emacs/manual/html_node/emacs/Clipboard.html]
+
+.the implementation of Spacemacs
+[source,elisp]
+____
+(defun spacemacs/xclipboard-copy ()
+  "Copies selection to x-clipboard."
+  (interactive)
+  (if (display-graphic-p)
+    (progn
+      (message "Copied region to x-clipboard!")
+      (call-interactively 'clipboard-kill-ring-save)) <1>
+    (if (region-active-p)
+      (progn
+        (shell-command-on-region
+         (region-beginning) (region-end)
+         (format "DISPLAY=%s %s"
+                 (spacemacs/xclipboard-get-display)
+                 (spacemacs//xclipboard-get-copy-command)))
+        (message (format "Copied region to clipboard \"%s\"!"
+                         (spacemacs/xclipboard-get-display)))
+        (deactivate-mark))
+      (message "No region active; can't copy to clipboard!"))))
+____
+<1> It's the correct solution. You shoulden't just "pipe" to it directly. (or create a new process)
+It will hang the clipboard. What you will get is `ERROR: UtilConnectUnix`. (Maybe?)
+
+.the paste implementation of Spacemacs
+[source,elisp]
+____
+(defun spacemacs/xclipboard-paste ()
+  "Pastes from x-clipboard."
+  (interactive)
+  (if (display-graphic-p)
+    (progn
+      (clipboard-yank)
+      (message "graphics active"))
+    (insert (shell-command-to-string
+             (format "DISPLAY=%s %s"
+                     (spacemacs/xclipboard-get-display)
+                     (spacemacs//xclipboard-get-paste-command)))))
+  (message (format "Pasted from clipboard \"%s\"!"
+                   (spacemacs/xclipboard-get-display))))
+____
+
+
+
+
+##### Code copy and pasted from Internet
+
+Don't use these. They are *REALLY BAD*! (at least the part I wrote is really bad)
+Please just refer to the source code from Spacemacs above
+
+Although I wrote some of these function I have totally no idea
+what they are doing. 
+
+[source,elisp]
+----
+  ;; (push "~/.spacemacs.d/packages" load-path)
+
+  ;; Run emacs wsl on GUI mode
+  ;; From the start menu
+  ;; instead of bash 'emacs'
+  (defun wsl-copy-string (str)
+    "pipe str to clip.exe"
+    (start-process "wsl-clipboard" nil "clip.exe")
+    (process-send-string "wsl-clipboard" str)
+    (kill-process "wsl-clipboard"))
+  ;; (async-shell-command (format "echo \"'%S'\" | clip.exe" str)))
+  ;; (shell-command-to-string (format "echo "'%s'" | clip.exe" str)))
+
   ; wsl-copy
   (defun wsl-copy (start end)
     (interactive "r")
+    ;; (let ((buffer (buffer-substring-no-properties start end)))
+    ;;   (wsl-copy-string buffer))
     (shell-command-on-region start end "clip.exe")
     (deactivate-mark))
-
-  (defun wsl-copy-string (str)
-     ;;avoid using this function. it's kind of bug. 
-    (async-shell-command (format "echo '%s' | clip.exe" str)))
-    ;; (shell-command-to-string (format "echo '%s' | clip.exe" str)))
+    ;; (shell-command-on-region start end "clip.exe")
 
   (defun wsl-get-clipboard ()
     "return a string from wsl clipboard"
-    (let ((clipboard
-           (shell-command-to-string "powershell.exe -command 'Get-Clipboard' 2> /dev/null")))
+    (interactive)
+    (let (
+          (clipboard (shell-command-to-string "powershell.exe -command 'Get-Clipboard' 2> /dev/null")))
       (setq clipboard (replace-regexp-in-string "\r" "" clipboard)) ; Remove Windows ^M characters
       (setq clipboard (substring clipboard 0 -1)) ; Remove newline added by Powershell
   ))
+  ;; (shell-command-to-string "powershell.exe -command 'Get-Clipboard'")
 
   (defun wsl-paste-insert ()
     (interactive)
@@ -198,4 +322,5 @@ Just hide it by
   (define-key evil-insert-state-map (kbd "C-v") 'wsl-paste-insert)
   (define-key evil-visual-state-map (kbd "C-v") 'wsl-paste-replace)
   (define-key evil-visual-state-map (kbd "C-c") 'wsl-copy)
+
 ----
