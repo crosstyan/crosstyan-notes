@@ -178,6 +178,8 @@ dotspacemacs-configuration-layers '(
 )
 ----
 
+Use `SPC-x-y` to copy `SPC-x-p` to paste
+
 You have to check the source code to tell what's going on here. The documentation is really bad (2021/08/08)
 
 ###### Source Code
@@ -324,5 +326,4 @@ what they are doing.
   (define-key evil-insert-state-map (kbd "C-v") 'wsl-paste-insert)
   (define-key evil-visual-state-map (kbd "C-v") 'wsl-paste-replace)
   (define-key evil-visual-state-map (kbd "C-c") 'wsl-copy)
-
 ----
