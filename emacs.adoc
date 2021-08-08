@@ -151,6 +151,8 @@ Just hide it by
   (add-to-list 'default-frame-alist '(internal-border-width . 5))
 ----
 
+If you use Spacemacs, `SPC T M` to maximize window. `SPC T m` to hide menu bar. 
+
 #### Copy and Paste
 - https://github.com/microsoft/wslg/issues/15[Cannot copy text *into* Kate editor, copying text *from* Kate works fine. · Issue #15 · microsoft/wslg]
 - https://github.com/microsoft/wslg/issues/295[Add support for Windows clipboard shortcuts · Issue #295 · microsoft/wslg]
@@ -178,7 +180,7 @@ dotspacemacs-configuration-layers '(
 )
 ----
 
-Use `SPC-x-y` to copy `SPC-x-p` to paste
+Use `SPC x y` to copy `SPC x p` to paste
 
 You have to check the source code to tell what's going on here. The documentation is really bad (2021/08/08)
 
