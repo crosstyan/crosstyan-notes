@@ -205,11 +205,12 @@ command_exists() {
   fi
 ----
 
-- https://www.gnu.org/software/emacs/manual/html_node/emacs/Clipboard.html[https://www.gnu.org/software/emacs/manual/html_node/emacs/Clipboard.html]
+https://www.gnu.org/software/emacs/manual/html_node/emacs/Clipboard.html[https://www.gnu.org/software/emacs/manual/html_node/emacs/Clipboard.html]
 
-.the implementation of Spacemacs
+
+.The copy implementation of Spacemacs
 [source,elisp]
-____
+----
 (defun spacemacs/xclipboard-copy ()
   "Copies selection to x-clipboard."
   (interactive)
@@ -228,13 +229,14 @@ ____
                          (spacemacs/xclipboard-get-display)))
         (deactivate-mark))
       (message "No region active; can't copy to clipboard!"))))
-____
+----
+
 <1> It's the correct solution. You shoulden't just "pipe" to it directly. (or create a new process)
 It will hang the clipboard. What you will get is `ERROR: UtilConnectUnix`. (Maybe?)
 
-.the paste implementation of Spacemacs
+.The paste implementation of Spacemacs
 [source,elisp]
-____
+----
 (defun spacemacs/xclipboard-paste ()
   "Pastes from x-clipboard."
   (interactive)
@@ -248,7 +250,7 @@ ____
                      (spacemacs//xclipboard-get-paste-command)))))
   (message (format "Pasted from clipboard \"%s\"!"
                    (spacemacs/xclipboard-get-display))))
-____
+----
 
 
 
