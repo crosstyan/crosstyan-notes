@@ -217,7 +217,7 @@ https://www.gnu.org/software/emacs/manual/html_node/emacs/Clipboard.html[https:/
   (if (display-graphic-p)
     (progn
       (message "Copied region to x-clipboard!")
-      (call-interactively 'clipboard-kill-ring-save)) <1>
+      (call-interactively 'clipboard-kill-ring-save)) ;;<1>
     (if (region-active-p)
       (progn
         (shell-command-on-region
