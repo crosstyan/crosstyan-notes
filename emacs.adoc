@@ -1,4 +1,8 @@
 
+## Reproducible Research
+- https://github.com/seblemaguer/emacs-reproducible-research/blob/master/reproducible_research.org[emacs-reproducible-research/reproducible_research.org at master · seblemaguer/emacs-reproducible-research]
+- https://rlhick.people.wm.edu/posts/reproducible-research.html[Reproducible Research and Literate Programming for Econometrics | Rob Hicks]
+
 ## Syntax in Org-mode
 
 - https://orgmode.org/worg/org-tutorials/org4beginners.html[Org mode beginning at the basics]
@@ -8,9 +12,13 @@
 
 ## Tutorial
 - http://ergoemacs.org/index.html[Xah Emacs Site]
+- https://github.com/noctuid/evil-guide[noctuid/evil-guide: Draft of a guide for using emacs with evil]
 - https://github.com/redguardtoo/mastering-emacs-in-one-year-guide/blob/master/guide-zh.org[mastering-emacs-in-one-year-guide/guide-zh.org at master · redguardtoo/mastering-emacs-in-one-year-guide]
 - https://book.emacs-china.org/[Master Emacs in 21 Days]
 - https://emacstalk.github.io/podcast/005/[005. 与 Emacs 高手陈斌闲聊 Emacs – EmacsTalk]
+- https://develop.spacemacs.org/doc/BEGINNERS_TUTORIAL.html[Beginners tutorial]
+- https://github.com/daviwil/emacs-from-scratch/tree/master[daviwil/emacs-from-scratch: An example of a fully custom Emacs configuration developed live on YouTube!]
+
 
 ## Install in WSL
 - https://github.com/hubisan/emacs-wsl[hubisan/emacs-wsl: Install and run Emacs with the Windows Subsystem for Linux (WSL) in Windows 10.]
@@ -22,7 +30,18 @@
 - https://steinslab.io/archives/2082[使用 WSL2 + X11 转发 - 在 Windows10 中打造 GNU/Linux 学习生产环境 - Steins;Lab]
 - https://docs.microsoft.com/en-us/windows/wsl/tutorials/gui-apps[Run Linux GUI apps with WSL | Microsoft Docs]
 - https://www.youtube.com/watch?v=kC3eWRPzeWw[WSL: Run Linux GUI Apps - YouTube]
-- 
+
+https://superuser.com/questions/1126721/rebooting-ubuntu-on-windows-without-rebooting-windows
+[source,powershell]
+----
+# Everything down
+wsl.exe --shutdown
+# Or use this
+Restart-Service LxssManager
+
+wsl.exe -t <DistroName>
+----
+
 
 ### Install Compile Dependency
 
@@ -103,7 +122,8 @@ https://medium.com/source-words/how-to-manually-install-update-and-uninstall-fon
 
 [source,bash]
 ----
-sudo apt install p7zip-full fonts-cascadia-code
+sudo apt install ttf-ancient-fonts
+sudo apt install fonts-cascadia-code
 sudo apt install p7zip-full
 mkdir sarasa
 cd sarasa
@@ -124,6 +144,13 @@ fc-list | grep "Sarasa"
 The latest version of Windows has implemented a GUI distro layer. So a X server is no longer needed. 
 
 But the border is really ugly. See the issue https://github.com/microsoft/wslg/issues/37[Default window decorations color · Issue #37 · microsoft/wslg]
+
+#### Emacs vs EmacsClient
+https://www.emacswiki.org/emacs/EmacsClient[Emacs Client]
+
+In `wslg`, Running `emacsclient` is kind of buggy I think. You can't run code block on `user-config` properly (when you are using `use-package`). Your package won't run properly. 
+
+Except this bug, EmacsClient is faster so better? 
 
 #### Turn off WSLg
 
@@ -184,81 +211,6 @@ Use `SPC x y` to copy `SPC x p` to paste
 
 You have to check the source code to tell what's going on here. The documentation is really bad (2021/08/08)
 
-###### Source Code
-
-.a bash shell script detect the OS we're using? Or you need to set the the variables. 
-[source,bash]
-----
-command_exists() {
-    local command=\"$1\"
-    type \"$command\" >/dev/null 2>&1
-  }
-  # Installing reattach-to-user-namespace is recommended on macOS.
-  if command_exists \"pbcopy\"; then
-      if command_exists \"reattach-to-user-namespace\"; then
-          printf \"reattach-to-user-namespace pbcopy\"
-      else
-          printf \"pbcopy\"
-      fi
-  elif command_exists \"clip.exe\"; then # WSL clipboard command
-      printf \"clip.exe\"
-  elif command_exists \"xsel\"; then
-      printf \"xsel -ib\"
-  elif command_exists \"putclip\"; then # cygwin clipboard command
-      printf \"putclip\"
-  fi
-----
-
-https://www.gnu.org/software/emacs/manual/html_node/emacs/Clipboard.html[https://www.gnu.org/software/emacs/manual/html_node/emacs/Clipboard.html]
-
-
-.The copy implementation of Spacemacs
-[source,elisp]
-----
-(defun spacemacs/xclipboard-copy ()
-  "Copies selection to x-clipboard."
-  (interactive)
-  (if (display-graphic-p)
-    (progn
-      (message "Copied region to x-clipboard!")
-      (call-interactively 'clipboard-kill-ring-save)) ;;<1>
-    (if (region-active-p)
-      (progn
-        (shell-command-on-region
-         (region-beginning) (region-end)
-         (format "DISPLAY=%s %s"
-                 (spacemacs/xclipboard-get-display)
-                 (spacemacs//xclipboard-get-copy-command)))
-        (message (format "Copied region to clipboard \"%s\"!"
-                         (spacemacs/xclipboard-get-display)))
-        (deactivate-mark))
-      (message "No region active; can't copy to clipboard!"))))
-----
-
-<1> It's the correct solution. You shoulden't just "pipe" to it directly. (or create a new process)
-It will hang the clipboard. What you will get is `ERROR: UtilConnectUnix`. (Maybe?)
-
-.The paste implementation of Spacemacs
-[source,elisp]
-----
-(defun spacemacs/xclipboard-paste ()
-  "Pastes from x-clipboard."
-  (interactive)
-  (if (display-graphic-p)
-    (progn
-      (clipboard-yank)
-      (message "graphics active"))
-    (insert (shell-command-to-string
-             (format "DISPLAY=%s %s"
-                     (spacemacs/xclipboard-get-display)
-                     (spacemacs//xclipboard-get-paste-command)))))
-  (message (format "Pasted from clipboard \"%s\"!"
-                   (spacemacs/xclipboard-get-display))))
-----
-
-
-
-
 ##### Code copy and pasted from Internet
 
 Don't use these. They are *REALLY BAD*! (at least the part I wrote is really bad)
@@ -266,6 +218,8 @@ Please just refer to the source code from Spacemacs above
 
 Although I wrote some of these function I have totally no idea
 what they are doing. 
+
+Maybe you'll get `ERROR: UtilConnectUnix` whiling using this. 
 
 [source,elisp]
 ----
@@ -295,7 +249,7 @@ what they are doing.
     "return a string from wsl clipboard"
     (interactive)
     (let (
-          (clipboard (shell-command-to-string "powershell.exe -command 'Get-Clipboard' 2> /dev/null")))
+          (clipboard (shell-command-to-string "powershell.exe -command 'Get-Clipboard' 2> /dev/null"))) 
       (setq clipboard (replace-regexp-in-string "\r" "" clipboard)) ; Remove Windows ^M characters
       (setq clipboard (substring clipboard 0 -1)) ; Remove newline added by Powershell
   ))
@@ -329,3 +283,18 @@ what they are doing.
   (define-key evil-visual-state-map (kbd "C-v") 'wsl-paste-replace)
   (define-key evil-visual-state-map (kbd "C-c") 'wsl-copy)
 ----
+
+## Chinese Input
+
+https://github.com/DogLooksGood/emacs-rime[DogLooksGood/emacs-rime: RIME ㄓ in Emacs]
+
+
+## Minor Mode
+
+- https://www.gnu.org/software/emacs/manual/html_node/elisp/Defining-Minor-Modes.html
+- https://nullprogram.com/blog/2013/02/06/[How to Make an Emacs Minor Mode]
+- https://emacsredux.com/blog/2013/09/25/removing-key-bindings-from-minor-mode-keymaps/[Removing/Altering Key Bindings from Minor Mode Keymaps | Emacs Redux]
+- https://zhuanlan.zhihu.com/p/22786322[那就从妖艳酷炫的快捷键开始吧！（一） - 知乎]
+- https://zhuanlan.zhihu.com/p/23187556[那就从妖艳酷炫的快捷键开始吧！（二） - 知乎]
+
+> This is equivalent to specifying `some param` *positionally*.

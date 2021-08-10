@@ -1,0 +1,42 @@
+# Some Note about Emacs Lisp the Language
+
+I don't think you need anything else except https://github.com/p3r7/awesome-elisp[p3r7/awesome-elisp: A curated list of emacs-lisp development resources]. But I still wanna keep some notes about elisp. (and some fun stuff)
+
+- https://segmentfault.com/a/1190000012304002[程序的基本形状 - SegmentFault 思否]
+- https://segmentfault.com/a/1190000039802488[不知多久能学会 Elisp - SegmentFault 思否]
+- https://github.com/bbatsov/emacs-lisp-style-guide[bbatsov/emacs-lisp-style-guide: A community-driven Emacs Lisp style guide]
+- http://ergoemacs.org/emacs/elisp.html[Practical Emacs Lisp]
+- https://www.emacswiki.org/emacs/FunctionalProgramming[Functional Programming]
+
+## Style Guide
+- https://github.com/bbatsov/emacs-lisp-style-guide[bbatsov/emacs-lisp-style-guide: A community-driven Emacs Lisp style guide]
+
+## How to Read Docs
+https://emacs.stackexchange.com/questions/64573/whats-eval-colon-eval-in-defcustom[help - What's :eval (colon eval) in defcustom? - Emacs Stack Exchange]
+
+## Binding
+- https://www.emacswiki.org/emacs/DynamicBindingVsLexicalBinding[Dynamic Binding Vs Lexical Binding]
+
+## Emacs Lisp and others
+- https://www.emacswiki.org/emacs/WhyDoesElispSuck[Why Does Elisp Suck]
+- https://www.emacswiki.org/emacs/CommonLispForEmacs[Common Lisp For Emacs]
+
+## Polymorphism
+- https://www.gnu.org/software/emacs/manual/html_node/elisp/Generic-Functions.html[Genric Function]
+
+## Keyword-Param
+- https://stackoverflow.com/questions/26102889/how-do-i-make-named-arguments-in-elisp
+- https://www.emacswiki.org/emacs/KeywordArguments[Keyword Arguments]
+
+## Helm
+- https://emacs.stackexchange.com/questions/47576/how-do-i-move-the-cursor-in-helm
+
+- `C-n`
+- `C-p`
+- `C-f`
+- `C-b`
+
+## Describe
+- https://develop.spacemacs.org/doc/DOCUMENTATION.html#describe-key-bindings
+
+> Describe functions are powerful Emacs introspection commands to get information about functions, variables, modes etc.
