@@ -1,0 +1,6 @@
+
+
+[source,bash]
+----
+yarn add eslint-config-airbnb-base
+----
