@@ -1,1 +1,121 @@
-https://github.com/Colt/webpack-demo-app[Colt/webpack-demo-app: Accompanies my 10-part Youtube Webpack course. Each commit comes with detailed notes.]
+# Functional Programming
+
+## Bind
+`bind` function will glue `f` and `g` together. (`f` and `g` are functions)
+
+[source,scala]
+----
+def f(a:Int): (Int, String) = ???
+def g(b:Int): (Int, String) = ???
+def g(c:Int): (Int, String) = ???
+----
+
+We can't combine `f`, `g` and `h` together directly, because its return value. 
+
+[source,scala]
+----
+val fResult = f(100)
+val gResult = bind(g, fResult)
+val hResult = bind(h, gResult)
+----
+
+We now know the signature of the `bind` function will be 
+
+[source,scala]
+----
+def bind(func: (Int) => (Int, String), tuple: Tuple2[Int, String]): Tuple2[Int, String]
+----
+
+### the body of bind
+
+[source,scala]
+This function will do the calculation and concat the string. 
+----
+def my_bind(func:(a: Int) => (Int, String), tuple:(Int, String)):(Int, String) = {
+    (func(tuple._1)._1, tuple._2+" "+func(tuple._1)._2)
+}
+----
+
+### A better way 
+[source,scala]
+----
+val finalResult = for {
+  fResult <- f(100)
+  gResult <- g(fResult)
+  hResult <- h(gResult)
+} yield hResult
+----
+
+## Wrapper
+[source,scala]
+----
+class Wrapper[A] (value: A) {
+
+  def map(f: (A) => A):Wrapper[A] = {
+    // Where is the value come from? 
+    // It's from the constructor of Wrapper class! 
+    new Wrapper[B](f(value))
+  }
+  def flatMap(f: (A) => Wrapper[A]):Wrapper[A] = {
+    // apply "f" to get a Wrapper
+    // return a new Wrapper
+    f(value)
+  }
+}
+----
+
+.A more generic version of wrap
+[source,scala]
+----
+class Wrapper[A] (value: A) {
+
+  def map[B](f: (A) => B):Wrapper[B] = {
+    // Where is the value come from? 
+    // It's from the constructor of Wrapper class! 
+    new Wrapper[B](f(value))
+  }
+  def flatMap[B](f: (A) => Wrapper[B]):Wrapper[B] = {
+    // apply "f" to get a Wrapper
+    // return a new Wrapper
+    f(value)
+  }
+}
+----
+
+You can get this as a result
+
+[source,scala]
+----
+val number_sum = for {
+  a <- new Wrapper(1)
+  b <- new Wrapper(2)
+  c <- new Wrapper(3)
+} yield a + b + c
+----
+
+But you can still get rid of the `new` keyword
+
+1. set the constructor private
+2. create an object naned `Wrapper` in `Wrapper` class which is called *companion object*
+3. create an `apply` method in the object
+
+### Apply method
+[source,scala]
+----
+val a = Wrapper(1)
+// Equals to 
+val a = Wrapper.apply(1)
+----
+
+How to define it? 
+[source,scala]
+----
+// construtor is private but still usable here. 
+def apply[A](value: A): Wrapper[A] = new Wrapper(value)
+----
+
+Apply "lifts" an ordinary value into the wrapper. 
+
+What is MONAD again? 
+
+Functor = mapable = a class that has a map method. 

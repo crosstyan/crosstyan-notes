@@ -112,8 +112,8 @@ I have totally no idea what these code means.
             --with-native-compilation
 make NATIVE_FULL_AOT=1 -j$(nproc)
 sudo checkinstall -y -D --pkgname=emacs28-nativecomp --pkgversion=1$(git rev-parse --short HEAD) \
-     --requires="libjansson-dev,libharfbuzz-dev,libgccjit-10-dev" --pkggroup=emacs --gzman=yes \
-     make install-strip
+    --requires="libjansson-dev,libharfbuzz-dev,libgccjit-10-dev" --pkggroup=emacs --gzman=yes \
+    make install-strip
 ----
 
 ### Install Fonts

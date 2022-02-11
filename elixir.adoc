@@ -1,0 +1,74 @@
+# Elixir
+
+## Features
+
+### FizzBuzz
+
+- https://www.leighhalliday.com/fizzbuzz-in-elixir[FizzBuzz in Elixir | Leigh Halliday]
+
+### Pipe
+
+The |> operator takes the result of the expression to its left and inserts it as
+the first parameter of the function invocation to its right. 
+
+### Ampersand (`&`) Notation
+
+```elixir
+add_one = &(&1 + 1)
+```
+
+```scala
+var add_one = (_:Int) + 1
+```
+
+There’s a second form of the & function capture operator. You can give it the
+name and arity (number of parameters) of an existing function, and it will
+return an anonymous function that calls it. 
+
+```elixir
+&(IO.puts(&1)) = &IO.puts/1
+```
+
+*its number of parameters (its arity)*
+
+In Elixir a named function is identified by both its name and its number of
+parameters (its arity). 
+
+These two functions are totally separate as far
+as Elixir is concerned. But from a human perspective, you’d imagine that if
+two functions have the same name they are somehow related, even if they
+have a different number of parameters.
+
+
+### Pattern Matching
+
+When you call a named function, Elixir tries to match your arguments with
+the parameter list of the first definition (clause). If it cannot match them, it
+tries the next definition of the same function (remember, this must have the
+same arity) and checks to see if it matches. It continues until it runs out of
+candidates.
+
+```elixir
+  # for some reason, elixir needs a comma before do
+  @spec whichbuzz(integer, integer, integer) :: String.t | integer
+  def whichbuzz(0, 0, _), do: "FizzBuzz"
+  def whichbuzz(0, _, _), do: "Fizz"
+  def whichbuzz(_, 0, _), do: "Buzz"
+  def whichbuzz(_, _, n), do: n
+  def fizzbuzz n do
+    whichbuzz(rem(n,3), rem(n,5), n)
+  end
+```
+
+#### Guard Clauses
+
+- https://hexdocs.pm/elixir/1.13.1/patterns-and-guards.html#guards[Patterns and Guards — Elixir v1.13.1]
+
+### Default Param
+
+When you define a named function, you can give a default value to any of its
+parameters by using the syntax param `\\` value. 
+
+## Specs
+
+- https://hexdocs.pm/elixir/1.13/typespecs.html#the-string-type[Typespecs — Elixir v1.13.1]

@@ -1,0 +1,59 @@
+# komorebi -- 又一个平铺窗口管理器
+
+Windows 上面其实已经有了不少的平铺窗口管理器, 虽然不像 Linux 中如此丰富多彩, 但也称得上是
+足够多了. 
+
+- https://github.com/TimUntersberger/nog[nog]
+- https://workspacer.org/[workspacer]
+- https://github.com/McYoloSwagHam/win3wm[win3wm]
+- https://github.com/sentialx/node-window-manager[node-window-manager]
+- https://github.com/sentialx/multrin[multrin]
+- https://github.com/fuhsjr00/bug.n[bug.n]
+- https://github.com/glsorre/amethystwindows[amethystwindows]
+
+如果算上一些商业软件的话或许这个列表还可以列得更长, 像是 https://www.nurgo-software.com/products/aquasnap[AquaSnap]. 
+
+它们的实现方式和设计哲学都各不相同, 就像 https://dwm.suckless.org/[dwm] 需要修改源码来
+实现配置文件的修改, 或者是 https://xmonad.org/[xmonad] 用 Haskell 来写配置文件, 流行的
+https://i3wm.org/[i3wm] 和 https://awesomewm.org/[awesome]. 当然还有我自己最喜欢的 
+https://github.com/baskerville/bspwm[bspwm] 只因它所遵从的设计哲学
+
+[quote, Mike Gancarz, The UNIX Philosophy]
+Make each program do one thing well.
+
+https://github.com/LGUG2Z/komorebi[komorebi] 作为 Windows 平台上面的 bspwm 的模仿者
+(或者说, 受 bspwm 的启发所创作出来的作品)
+
+## 为什么是平铺式
+
+如果你对我上面所说的一头雾水, 或许你需要补充一些基础知识, 像是堆叠式窗口管理器和平铺式窗口
+管理器的一些区别. 如果用 Linux 的话可能还要考究一下 Desktop Environment 和 Window 
+Manager 之分等. 其实折腾这些最好的方法就是自己去体验一下, 感受一下更多依赖键盘的工作流是
+怎么样的. 这里只简短地给出自己的理由
+
+- 减少手离键盘的时间, 更爽
+- 所有窗口自动摆放到一个工作区 (又称虚拟桌面) 之中, 减少手动拖曳窗口的时间和心智负担
+- 自定义快捷键
+- Windows 的虚拟桌面在快捷键绑定等方面做得太差了
+
+总之, 如果你习惯了在终端的操作, 喜欢 Vim 或者 Emacs, 你就绝对应该尝试一款平铺式窗口管理器
+并将其结合到自己的工作流之中. 当然如果日常使用不需要打开多个窗口, 平铺式与堆叠式之分就反而
+不那么重要, 还是应该结合自己的使用场景来考虑. 
+
+### 参考
+
+- https://zhuanlan.zhihu.com/p/83789662[平铺窗口管理器(tile windown manager)的使用诀窍 - 知乎]
+- https://www.zhihu.com/question/447039478[平铺式窗口管理器真的好用吗？ - 知乎]
+
+## bspwm 的设计
+
+在谈论 komorebi 之前, 我想先聊聊 bspwm, 但是在聊这个之前我需要确认读者的背景. 
+
+## komorebi 
+
+### 参考
+
+- https://www.bilibili.com/video/BV1kZ4y1u7dw?from=search&seid=10543614526195025971[bspwm介绍，阅读 man page_哔哩哔哩_bilibili]
+
+
+

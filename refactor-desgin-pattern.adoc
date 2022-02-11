@@ -1,0 +1,8 @@
+# Composition better than inheritance
+# Solid principle
+- single responsible
+- open/close
+- Liskov substitution (subclass sould remain cpmpatible with the behaviour of
+the superclass)
+- Interface Segregation
+- DI
