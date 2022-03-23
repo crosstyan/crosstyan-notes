@@ -107,7 +107,7 @@ I was compiled by Scala 3. :)
 - https://docs.scala-lang.org/style/method-invocation.html
 - https://docs.scala-lang.org/scala3/new-in-scala3.html
 
-= Others
+== Others
 https://docs.scala-lang.org/scala3/book/taste-control-structures.html[CONTROL STRUCTURES]
 
 .Start with the Weird Object
@@ -897,7 +897,7 @@ If a function has no arguments, you can omit the parentheses in Elixir
 
 Elixir comes with a built-in operator, `|>`, called the _pipeline operator_
 
-= Terminology
+== Terminology
 - FIP function input parameter
 - PAF partially applied function
 
