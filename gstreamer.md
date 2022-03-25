@@ -75,15 +75,15 @@ gst-typefind-1.0
 
 ## ASCII Arts
 
-- [](https://asciiflow.com/)
-- [](https://textik.com/)
-- [](https://datatracker.ietf.org/doc/html/rfc8140)
-- [](http://wiki.c2.com/?UmlAsciiArt)
-- [](https://metacpan.org/pod/Graph::Easy)
-- [](https://stackoverflow.com/questions/123378/command-line-unix-ascii-based-charting-plotting-tool)
-- [](https://www.luismg.com/protocol/)
-- [](https://news.ycombinator.com/item?id=18267275)
+- <https://asciiflow.com/>
+- <https://textik.com/>
+- <https://datatracker.ietf.org/doc/html/rfc8140>
+- <http://wiki.c2.com/?UmlAsciiArt>
+- <https://metacpan.org/pod/Graph::Easy>
+- <https://stackoverflow.com/questions/123378/command-line-unix-ascii-based-charting-plotting-tool>
+- <https://www.luismg.com/protocol/>
+- <https://news.ycombinator.com/item?id=18267275>
 
 ## OpenCV
 
-- [](https://zhuanlan.zhihu.com/p/377407799)
+- <https://zhuanlan.zhihu.com/p/377407799>

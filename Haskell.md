@@ -2,7 +2,7 @@
 
 ## Installation
 
-https://wiki.archlinux.org/title/haskell
+<https://wiki.archlinux.org/title/haskell>
 
 ```bash
 sudo pacman -S ghc ghc-static stack hlint
@@ -91,7 +91,7 @@ arguments) the terms any further.
 Reducing terms should ordinarily *converge* to beta normal form, and divergence is
 the opposite of convergence, or normal form.
 
-## GHCi
+### GHCi
 
 Defining functions in a Haskell source code file and in GHCi are a little
 different. To introduce definitions of values or functions in GHCi, you must use
@@ -111,7 +111,9 @@ GHCi is no longer necessary.
 :type
 ```
 
-## Infix Operators
+## Basic
+
+### Infix Operators
 
 ```haskell
 1 + 2
@@ -139,7 +141,7 @@ infixl 6 -
 `7` is the precedence: higher is applied first, on a scale of
 0-9.
 
-## Space
+### Space
 
 One thing to keep in mind is that indentation of
 Haskell code is significant and can change the meaning of the
@@ -160,7 +162,7 @@ foo x = let y = x + 1
     (* y z)))
 ```
 
-## sectioning
+### sectioning
 
 ```haskell
 (+1) 2 -- = 3
@@ -221,7 +223,6 @@ beyond evaluating a function or expression.
 We used `::` to declare the types of each top-level expression.
 It isn’t strictly necessary, as the compiler can infer these types,
 but it is a good habit to be in as you write longer programs.
-
 
 ```haskell
 concat :: [[a]] -> [a]
@@ -303,10 +304,10 @@ snd :: (a, b) -> b
 ```
 
 In Haskell there are seven categories of entities that have
-names: 
+names:
 
-- functions 
-- term-level 
+- functions
+- term-level
 - variables
 - data constructors
 - type variables
@@ -357,7 +358,7 @@ Currying refers to the nesting of multiple functions, each accepting one
 argument and returning one result, to allow the illusion of multiple-parameter
 functions.
 
-#### right associative.
+#### right associative
 
 ```haskell
 f:: a -> a -> a
@@ -375,13 +376,13 @@ function application is left associative.
 
 ### Uncurrying
 
-If you uncurry `(+)`, the type changes from `Num a => a -> a -> a` to 
+If you uncurry `(+)`, the type changes from `Num a => a -> a -> a` to
 `Num a => (a, a) -> a` (the latter is a tuple as parameter)
 
 - Uncurried functions: One function, many arguments
 - urried functions: Many functions, one argument apiece
 
-## Polymorphism
+### Polymorphism
 
 Broadly speaking, type signatures may have three kinds of types: concrete,
 constrained polymorphic, or parametrically polymorphic.
@@ -427,7 +428,7 @@ instance Bounded Bool -- Defined in ‘GHC.Enum’
 ```
 
 All members of `Ord` must be members of `Eq`, and all members of `Enum` must be
-members of `Ord`. 
+members of `Ord`.
 
 To be able to put something in an enumerated list, they must be able to be
 ordered; to be able to order something, they must be able to be compared for
@@ -444,7 +445,7 @@ class Eq a where
   (==) :: a -> a -> Bool
   (/=) :: a -> a -> Bool
   {-# MINIMAL (==) | (/=) #-}
-  	-- Defined in ‘GHC.Classes’
+   -- Defined in ‘GHC.Classes’
 ```
 
 First, it tells us we have a typeclass called Eq where there are
@@ -712,7 +713,7 @@ incTimes times n = applyTimes times (+1) n
 
 $\bot$ in Haskell is bottom. Logic `False`
 
-Use Maybe
+Use Maybe to avoid bottom (error).
 
 ### Fabonacci
 
@@ -771,7 +772,7 @@ make it happen.
 
 #### Go functions
 
-https://en.wikibooks.org/wiki/Haskell/Recursion
+<https://en.wikibooks.org/wiki/Haskell/Recursion>
 
 ```haskell
 factorial n = go n 1
@@ -789,7 +790,7 @@ You can call it other name though, it just a convention.
 
 ### Type keyword
 
-https://joelburget.com/data-newtype-instance-class/
+<https://joelburget.com/data-newtype-instance-class/>
 
 The type keyword, instead of the more familiar data or
 newtype, declares a type synonym, or type alias.
@@ -885,8 +886,8 @@ cons cell.
 
 ### map
 
-- https://www.quora.com/What-is-the-difference-between-map-and-fmap-in-Haskell-1
-- https://stackoverflow.com/questions/6824255/whats-the-point-of-map-in-haskell-when-there-is-fmap
+- <https://www.quora.com/What-is-the-difference-between-map-and-fmap-in-Haskell-1>
+- <https://stackoverflow.com/questions/6824255/whats-the-point-of-map-in-haskell-when-there-is-fmap>
 
 ```haskell
 map :: (a -> b) -> [a] -> [b]
@@ -1143,7 +1144,9 @@ deriving (Eq, Show)
 
 Accessing the fields of a record by `key`, like clojure `keyword`.
 
-### Kinds
+## Kinds
+
+`:kind` or `:k` in the REPL.
 
 *Kinds* are the types of type constructors, primarily encoding the
 number of arguments they take.
@@ -1153,8 +1156,13 @@ kind `* -> * -> *` must be applied twice before it will be a real type. This is
 known as a higher-kinded type. Lists, for example, are higher-kinded datatypes
 in Haskell.
 
-https://wiki.haskell.org/Kind
-https://stackoverflow.com/questions/27095011/what-exactly-is-the-kind-in-haskell
+- <https://wiki.haskell.org/Kind>
+- <https://stackoverflow.com/questions/27095011/what-exactly-is-the-kind-in-haskell>
+
+kind * represents a concrete type.
+
+Data constructors are functions. As it happens, they behave like Haskell
+functions in that they are curried as well.
 
 > "kinds" are types for "types"
 
@@ -1173,24 +1181,15 @@ data Either a b = Left a | Right b
 - Right is just like `Some` (`Just`)
 - Left is just like `None` (`Nothing`), except you can include content with it to describe the problem
 
-### Kinds What?
-
-`:kind` or `:k` in the REPL.
-
-kind * represents a concrete type.
-
-Data constructors are functions. As it happens, they behave like Haskell
-functions in that they are curried as well.
-
 ## Algebra
 
 ### Monoid
 
 幺半群, 又稱為單群、亞群、具幺半群或**四分之三群**.
 
-- https://en.m.wikibooks.org/wiki/Haskell/Understanding_monads
-- https://fsharpforfunandprofit.com/posts/monoids-without-tears/
-- https://medium.com/@lettier/your-easy-guide-to-monads-applicatives-functors-862048d61610
+- <https://en.m.wikibooks.org/wiki/Haskell/Understanding_monads>
+- <https://fsharpforfunandprofit.com/posts/monoids-without-tears/>
+- <https://medium.com/@lettier/your-easy-guide-to-monads-applicatives-functors-862048d61610>
 
 Here's the rules.
 
@@ -1411,7 +1410,7 @@ class Functor f where
 What is `$` again? It is used to evaluate the value of type `a` first, and then
 apply the function `(a -> b)` to it.
 
-### Laws
+### Functor Laws
 
 1. Identity
 2. Composition
@@ -1441,7 +1440,7 @@ fmap (+1) negate :: Num b => b -> b
 fmap (+1) negate 10 -- -9 = ((+1) . negate) 10 -- first negate then plus 1
 ```
 
-https://stackoverflow.com/questions/48211978/haskell-function-composition-and-fmap-f
+<https://stackoverflow.com/questions/48211978/haskell-function-composition-and-fmap-f>
 
 ```haskell
 -- `(->) r` (i.e. functions)
@@ -1539,7 +1538,7 @@ Can't do anything useful with IO without Monad.
 
 ### Nat replace the container
 
-https://stackoverflow.com/questions/3071136/what-does-the-forall-keyword-in-haskell-ghc-do
+<https://stackoverflow.com/questions/3071136/what-does-the-forall-keyword-in-haskell-ghc-do>
 
 Turn on `RankNTypes` (or `Rank2Types`)
 
@@ -1549,7 +1548,7 @@ type Nat f g = forall a . f a -> g a
 
 ## Applicative
 
-https://en.wikipedia.org/wiki/Applicative_functor
+<https://en.wikipedia.org/wiki/Applicative_functor>
 
 *Monoid* gives us a means of mashing two values of the same type together.
 *Functor*, on the other hand, is for function application over some structure we
@@ -1807,7 +1806,7 @@ are commutative monads that do not order actions.
 
 ### IO Monad
 
-https://stackoverflow.com/questions/2468320/whats-the-difference-between-io-string-and-normal-string-in-haskell
+<https://stackoverflow.com/questions/2468320/whats-the-difference-between-io-string-and-normal-string-in-haskell>
 
 ```haskell
 getLine :: IO String
@@ -1825,9 +1824,10 @@ getLine >>= putStrLn  -- first getLine, then putStrLn
 
 ### Do notation
 
-https://en.wikibooks.org/wiki/Haskell/do_notation
+<https://en.wikibooks.org/wiki/Haskell/do_notation>
 
 It just creates a closure?
+
 
 ```haskell
 -- action1 :: f a
@@ -1855,7 +1855,7 @@ do  putStr "Hello"
     putStr "\n" 
 ```
 
-https://stackoverflow.com/questions/37136294/what-operator-does
+<https://stackoverflow.com/questions/37136294/what-operator-does>
 
 > `>>` is a shortcut for when you don't care about the value. That is, `a >> b` is
 equivalent to `a >>= \_ -> b` (assuming a sane (or default) definition of `>>` in
@@ -1921,7 +1921,6 @@ mkSimpleCow' name age weight = do n <- noEmpty name
 What about either?
 
 ```haskell
-j
 (>>=) ::Monad m 
   => m a 
   -> (a -> m b) 
@@ -1961,9 +1960,19 @@ mcomp' f g x = f =<< g x
 flip (>=>) :: Monad m => (b -> m c) -> (a -> m b) -> a -> m c
 ```
 
+### flatMap
+
+<https://www.zhihu.com/question/34548588>
+
+`>>=` is like Scala's flatMap. It takes a function, maps it over an instance of
+a monad and then flattens the result.
+
 ## Foldable
 
 > Revenge of the monoids
+
+The Hackage documentation for the Foldable typeclass describes it as being a,
+“class of data structures that can be folded to a summary value.”
 
 ```haskell
 type Foldable :: (* -> *) -> Constraint
@@ -1985,7 +1994,37 @@ class Foldable t where
   {-# MINIMAL foldMap | foldr #-}
 ```
 
+The two most important operations for Foldable.
+
+```haskell
+class Foldable (t :: * -> *) where
+  fold :: Monoid m => t m -> m
+  foldMap :: Monoid m => (a -> m) -> t a -> m
+```
+
+```haskell
+import Data.Foldable
+
+-- useful monoid
+map Sum [1..5] :: (Num a, Enum a) => [Sum a]
+fold $ map Sum [1..5] -- fold :: (Num a, Enum a) => [Sum a] -> Sum a = Sum {getSum = 15}
+
+foldMap Sum :: (Num a) => [a] -> Sum a
+foldMap Sum [1..5]
+```
+
 ## Traversable
+
+Functor gives us a way to transform any values embedded in structure.
+
+Applicative gives us a way to transform any values contained within a structure
+using a function that is also embedded in structure. This means that each
+application produces the effect of adding structure which is then applicatively
+combined.
+
+Foldable gives us a way to process values embedded in a structure as
+if they existed in a sequential order, as we’ve seen ever since we learned about
+list folding.
 
 Traversable allows you to transform elements inside the structure like a
 functor, producing applicative effects along the way, and lift those potentially
@@ -2006,9 +2045,589 @@ class (Functor t, Foldable t) => Traversable t where
   {-# MINIMAL traverse | sequenceA #-}
 ```
 
-## Manage Project
+using `sequenceA` flips the structures around — instead of a list of *Maybe* values,
+you get a *Maybe* of a list value.
 
-https://stackoverflow.com/questions/30913145/what-is-the-difference-between-cabal-and-stack
+Using `catMaybes` allows you to sum (or otherwise process) the
+list of Maybe values even if there’s potentially a Nothing value
+lurking within.
+
+```haskell
+sequenceA [Just 1, Just 2, Just 3] -- Just [1, 2, 3]
+sequenceA [Just 1, Just 2, Nothing] -- Nothing
+catMaybes [Just 1, Just 2, Nothing] -- [1, 2]
+```
+
+```haskell
+fmap     :: (a -> b) -> f a -> f b          -- f is functor
+(=<<)    :: (a -> m b) -> m a -> m b        -- flip bind. ie. flip >>=  m is monad
+traverse :: (a -> f b) -> t a -> f (t b)    -- f is applicative and t is traversable.
+```
+
+We’re still mapping a function over some embedded value(s), like fmap, but
+similar to flip bind, that function is itself generating more structure.
+
+However, unlike flip bind, that structure can be of a different type than the
+structure we lifted over to apply the function. And at the end, it will flip the
+two structures around, as `sequenceA` did. `t a -> f (t a)`
+
+`mapM` is traverse.
+
+```haskell
+mapM :: Monad m => (a -> m b) -> [a] -> m [b] -- applicative f is list []
+```
+
+### Traversable Laws
+
+```haskell
+-- Naturality
+traverse Identity = Identity
+-- Identity
+t . traverse f = traverse (t . f)
+-- Composition
+traverse (Compose . fmap g . f) = Compose . fmap (traverse g) . traverse f
+```
+
+## Reader
+
+### Functor Functions
+
+See [Functor of function](#Functor%20of%20function). `fmap` `<$>` equivalent is `(.)` in Haskell. (Function Composition)
+
+```haskell
+boop = (*2)
+doop = (+10)
+
+bloop :: Integer -> Integer
+bloop = boop <$> doop
+
+bbop :: Integer -> Integer
+bbop = (+) <$> boop <*> doop
+liftA2 :: Applicative f => (a -> b -> c) -> f a -> f b -> f c
+bbop = liftA2 (+) boop doop
+clearBBOP x = (x * 2) + (x + 10)
+
+-- first fmap
+(*2) :: Num a => a -> a
+(+)  :: Num a => a -> a -> a
+(+) <$> (*2) :: Num a => a -> a -> a
+((+) <$> (*2)) x y = x * 2 + y
+((+) <$> (*2)) == \x -> (+) (x * 2)
+-- what abount <*>
+(<*>) :: Applicative f => f (a -> b) -> f a -> f b
+--   Num a =>     a -> a -> a         a -> a
+confuseBBOP = (\x -> (+) (x * 2)) <*> (+10)
+            = (\x -> (+) (x * 2) (x + 10))
+
+boopDoop :: Integer -> Integer
+boopDoop = do
+  a <- boop
+  b <- doop
+  return (a + b)
+```
+
+```haskell
+do  a <- (*2)
+    b <- (+10)
+    return (a, b)
+
+-- what the meaning of return
+-- wrap to a monad of what? a function?
+-- https://stackoverflow.com/questions/14430397/about-the-function-monad
+instance Monad ((->) r) where
+  return x = \_ -> x          -- wrap to a lambda
+  h >>= f = \w -> f (h w) w
+
+                          --    \a -> (+10) :: Num a => p -> a -> a
+                          -- ((*2) w) as the parameter of a, which is useless in lambda (\a -> (+ 10))
+(*2) >>= (\a -> (+10)) = \w -> (\a -> (+10)) ((*2) w) w
+                   --  = \w -> (+10) ((*2) w) w  -- wrong simplication
+                       = \w -> (+10) w
+
+(*2) >>= (\a -> (+10) >>= (\b -> return $ (+) a b))
+```
+
+```haskell
+import Control.Applicative (liftA2)
+
+(<||>) :: (a -> Bool) -> (a -> Bool) -> a -> Bool
+(<||>) = liftA2 (||)
+       = \f g -> (||) <$> f <*> g
+```
+
+```haskell
+capFirst :: [Char] -> [Char]
+capFirst (x:xs) = toUpper x:xs
+capFirst []   = []
+
+cap :: [Char] -> [Char]
+cap = map toUpper
+rev :: [Char] -> [Char]
+rev = reverse
+
+-- cap and then reverse
+-- We could compose them, using (.) or fmap
+composed :: [Char] -> [Char]
+composed = rev . cap
+fmapped :: [Char] -> [Char]
+fmapped = rev <$> cap
+tupled :: [Char] -> ([Char], [Char])
+tupled = (,) <$> (rev <$> capFirst ) <*> (cap <$> rev)
+
+tupled' :: [Char] -> ([Char], [Char])
+tupled' = do
+  x <- rev <$> capFirst
+  y <- rev <$> cap
+  return (x, y)
+```
+
+We’d use this when two functions would share the same input and we want to apply
+some other function to the result of those to reach a final result.
+
+As we saw above, functions have Functor, Applicative, and Monad instances.
+Usually when you see or hear the term Reader, it’ll be referring to the Monad
+instance.
+
+With the Functor of functions, we are able to map an ordinary function over
+another to create a new function awaiting a final argument.
+
+The Applicative and Monad instances for the function type give us a way to map a
+function that is awaiting an *a* over another function that is also awaiting an
+*a*.
+
+### Reader is function
+
+Ah yes, right. Reader is a newtype wrapper for the function type
+
+- https://stackoverflow.com/questions/14178889/what-is-the-purpose-of-the-reader-monad
+
+```haskell
+newtype Reader r a = Reader { runReader :: r -> a }
+```
+
+### Function Applicative
+
+```haskell
+-- r -> is a function
+pure :: a ->  f a
+pure :: a -> (r -> a)
+(<*>) :: f (a -> b)    ->  f a     ->  f b
+(<*>) :: (r -> a -> b) -> (r -> a) -> (r -> b)
+```
+
+We have two arguments in this function, and both of them are functions waiting
+for the `r` input. When that comes, both functions will be applied to return a
+final result of `b`.
+
+What we’re trying to highlight here is that Reader is not always Reader,
+sometimes it’s the ambient Applicative or Monad associated with the partially
+applied function type, here that is `r ->`.
+
+## State
+
+- <https://en.wikibooks.org/wiki/Haskell/Understanding_monads/State>
+- https://en.wikipedia.org/wiki/Mind%E2%80%93body_problem
+
+In Haskell, we’re not allowed to secretly change some value; all we can do is
+accept arguments and return a result. The State type in Haskell is a means of
+expressing *state that may change in the course of evaluating code without resort*
+*to mutation.*
+
+In Haskell, if we use the State type and its associated Monad
+(for convenience, not strictly necessary), we can have state
+which:
+
+1. doesn’t require IO;
+2. is limited only to the data in our State container;
+3. maintains referential transparency;
+4. is explicit in the types of our functions.
+
+### Random
+
+```haskell
+import System.Random
+mkStdGen :: Int -> StdGen 
+next $ mkStdGen 0 :: (Int, StdGen)
+-- use `snd` to get the next random number generator
+next $ snd $ next $ mkStdGen 0
+-- doing this forever? 
+```
+
+```haskell
+-- what is run?
+newtype Reader r a =
+  Reader { runReader :: r -> a }
+
+newtype State s a =
+  State { runState :: s -> (a, s) }
+-- the signature of runState
+runState          :: s -> (a, s)
+next              :: g -> (Int, g)
+next $ mkStdGen 0 ::      (Int, StdGen)
+```
+
+State is a **function** that takes input state and returns an output value, `a`,
+tupled with the new state value.
+
+The state function is a constructor that takes a State-like function and embeds
+it in the State monad transformer.
+
+```haskell
+state :: Monad m => (s -> (a, s)) -> StateT s m a
+```
+
+### RandomIO
+
+```haskell
+import Control.Monad.IO.Class (MonadIO)
+import Control.Monad.Trans.State
+import System.Random
+
+rollDie :: State StdGen Integer
+rollDie = state $ do
+  (n, s) <- randomR (1, 6)
+  return (n, s)
+
+-- evalState rollDie $ mkStdGen 0
+
+-- or use liftA3
+rollThreeDie = (,,) <$> rollDie <*> rollDie <*> rollDie
+
+-- repeat :: a -> [a]
+-- will make infinite list of a
+-- just take some of them
+
+-- So what happened? What happened is we repeated a single die value — we didn’t
+-- repeat the state action that produces a die.
+
+-- replicateM :: Monad m => Int -> m a -> m [a]
+
+nDie n = replicateM n rollDie
+
+-- evalState (nDie 5) (mkStdGen 0)
+
+-- We can also use randomIO, which uses IO to get a new value each time without
+-- needing to create a unique value for the StdGen
+
+rollsToGetTwenty :: StdGen -> Integer
+rollsToGetTwenty = go 0 0 where
+  go :: Integer -> Integer -> StdGen -> Integer
+  go sum count gen
+    | sum >= 20 = count
+    | otherwise =
+    let (die, nextGen) = randomR (1, 6) gen
+    in go (sum + die) (count + 1) nextGen
+
+randomStdGen :: MonadIO f => f StdGen
+randomStdGen = mkStdGen <$> randomIO
+
+-- evalState :: State s a -> s -> a
+randomFiveDie :: MonadIO f => f [Integer]
+randomFiveDie = evalState (nDie 5) <$> randomStdGen
+
+timeToGetTwenty :: MonadIO f => f Integer
+-- timeToGetTwenty = rollsToGetTwenty . mkStdGen <$> randomIO
+timeToGetTwenty = rollsToGetTwenty <$> randomStdGen
+
+combineRoll :: MonadIO f => f ([Integer], Integer , Integer)
+combineRoll = do
+                gen <- randomStdGen
+                let dies = evalState (nDie 10) gen -- should be a fixed value 10
+                    times = rollsToGetTwenty gen
+                    sumation = sum $ take (fromIntegral times) dies in
+                    return (dies, times, sumation) -- return wrap the side effect back to the caller
+
+-- randomIO is something not pure/magic.
+-- so we must wrap it in a monad (MonadIO)
+-- https://stackoverflow.com/questions/7314789/how-to-take-out-a-value-out-of-a-monad-in-haskell
+```
+
+## Composing types
+
+Functors and applicatives are both closed under composition: this means that you
+can compose two functors (or two applicatives) and return another functor (or
+applicative, as the case may be). This is not true of monads, however; when you
+compose two monads, the result is not necessarily another monad.
+
+The use of the prefixes run or get indicates that these accessor functions are
+means of extracting the underlying value from the type. There is no real
+difference in meaning between run and get.
+
+You’ll see these accessor functions often, particularly with utility types like
+Identity or transformer variants reusing an original type.
+
+> There’s no problem composing two arbitrary datatypes that have Monad instances.
+We saw this already when we used Compose with Maybe and list, which both have
+Monad instances defined. *However, the result of having done so does not give you*
+*a Monad.*
+
+## Monad Transformer
+
+We’ve now seen what the problem with Monad is: you can put two together but you
+don’t get a new Monad instance out of it.  When we need to get a new Monad
+instance, we need a monad transformer. It’s not magic; the answer is in the
+types.
+
+The fundamental problem with composing two monads lies in the impossibility of
+joining two unknown monads.  In order to make that join happen, we need to
+reduce the polymorphism and get concrete information about one of the monads
+that we’re working with.
+
+A monad transformer is a variant of an ordinary type that takes an additional
+type argument which is assumed to have a Monad instance.
+
+The transformer variant of a type gives us a Monad instance that binds over both
+bits of structure. This allows us to compose monads and combine their effects.
+
+-- https://www.youtube.com/watch?v=SMj-n2f7wYY
+-- https://github.com/TheWizardTower/monadTransformers
+-- https://www.youtube.com/watch?v=j3Kl0t07TRc
+
+```haskell
+newtype IdentityT f a = IdentityT { runIdentityT :: f a }
+-- Identity Functor
+instance Functor Identity where
+  fmap f (Identity a) = Identity (f a)
+-- one implementation
+instance (Functor m) => Functor (IdentityT m) where
+  fmap f (IdentityT fa) = IdentityT (fmap f fa)
+
+-- official implementation
+-- See https://hackage.haskell.org/package/transformers-0.6.0.4/docs/Control-Monad-Trans-Identity.html#v:fmap
+```
+
+```haskell
+-- we want to wrap Monad m with another Monad t
+-- that has >>= (bind) operator
+(>>=) ::            Monad m => a -> (a ->   m b) ->   m b
+(>>=) :: (Monad m, Monad t) => a -> (a -> t m b) -> t m b
+
+(\a -> IdentityT (Just (a + 10))) =<< (IdentityT (Just 10)) = IdentityT (Just 20)
+
+fmap :: (a -> b) -> IdentityT m a -> IdentityT m b 
+
+-- Maybe you think that fmap can do it
+fmap (\a -> IdentityT (Just (a + 10))) (IdentityT (Just 10))
+-- --> IdentityT (Just (IdentityT (Just 20)))
+-- the situation is worse
+-- join can't reduce -- none of the adjacent monads are the same
+
+-- We need another function
+runIdentityT :: IdentityT f a -> f a -- get rid of IdentityT wrap
+
+fmap (runIdentityT . (\a -> IdentityT (Just (a + 10)))) (IdentityT (Just 10))
+-- --> IdentityT (Just (Just 20))
+-- You know the rest of the story
+
+runIdentityT $ fmap (runIdentityT . (\a -> IdentityT (Just (a + 10)))) (IdentityT (Just 10))
+-- --> Just (Just 20)
+
+import Control.Monad
+join $ runIdentityT $ fmap (runIdentityT . (\a -> IdentityT (Just (a + 10)))) (IdentityT (Just 10))
+-- --> Just 20
+-- remember join $ f <$> g x ==  g x >>= f == f =<< g x
+
+IdentityT $ join $ runIdentityT $ fmap (runIdentityT . (\a -> IdentityT (Just (a + 10)))) (IdentityT (Just 10))
+-- --> IdentityT (Just 20)
+
+(Monad m, MonadTrans t) 
+=> m (t m b) -- Just (IdentityT (Just 20))) -- here is our problem pattern
+-- -> here is next step. not lambda args
+-> m (m b)   -- Just (Just 20))       -- by runIdentityT (assuming t is IdentityT)
+-> m b       -- Just 20               -- by join
+-> t m b     -- IdentityT (Just 20)   -- by IdentityT (data constructor)
+
+-- a better definition
+instance (Monad m) => Monad (IdentityT m) where
+  return = pure -- pure x = IdentityT (pure x)
+  -- eta reduction
+  return = IdentityT . return
+  m              >>= k = IdentityT $ runIdentityT . k =<< runIdentityT m
+  -- using pattern matching
+  (IdentityT ma) >>= f = IdentityT $ runIdentityT . f =<< ma
+
+lift :: (Monad m, MonadTrans t) => m a ->  t m a
+```
+
+```haskell
+($ 5) == (\f f 5)
+
+(=<<) :: Monad m =>
+(a -> m b)
+-> m a
+-> m b
+
+(IdentityT $
+(runIdentityT . k) :: (a -> m b)
+=<<
+(runIdentityT m)   :: m a) :: IdentityT m b
+
+import Control.Monad.Trans.Class(MonadTrans)
+(Monad m, MonadTrans t) =>
+      m a
+  ->  t m a
+
+-- SURPRISE! That's lift
+```
+
+- <https://en.wikibooks.org/wiki/Haskell/Monad_transformers>
+- <https://github.com/scotty-web/scotty/blob/c36f35b89993f329b8ff08852c1535816375a926/Web/Scotty/Internal/Types.hs>
+- https://en.wikipedia.org/wiki/Monad_transformer
+- https://hackage.haskell.org/package/transformers-0.6.0.4/docs/Control-Monad-Trans-Class.html#v:lift
+
+In general, in order to make the types fit, we’ll need some way to fold and
+reconstruct the type we have concrete information for.
+
+We use transformers when we want a `>>=` operation over *f* and *g* of different
+types (but both have Monad instances).
+
+### See the pattern
+
+The general pattern is this: You want to compose two polymorphic types, `f` and
+`g`, that each have a Monad instance. But you’ll end up with this pattern:
+
+```haskell
+f (g f b)
+```
+
+Monad’s bind can’t join those types, not with that intervening `g`. So you need
+to get to this:
+
+```haskell
+f (f b)
+```
+
+The essence of Monad is join, but here you have only one bit of `g` structure,
+not `g (g ...)`, so that’s not enough. The straightforward thing to do is to make
+`g` concrete.
+
+With concrete type information for the inner bit of structure, we can fold out
+the `g` and get on with it. The good news is that transformers don’t require `g`
+be concrete;
+
+### Recovering an ordinary type from a transformer
+
+If you have a transformer variant of a type and want to use it as if it was the
+non-transformer version, you need some structure that doesn’t do anything. `Identity`
+
+```haskell
+type Maybe a    = MaybeT    Identity a
+type Either e a = EitherT e Identity a
+type Reader r a = ReaderT e Identity a
+type State s a  = StateT s  Identity a
+```
+
+### Scotty
+
+```haskell
+type ScottyM = ScottyT Text IO
+type ActionM = ActionT Text IO
+```
+
+We’ll use ActionM and ActionT and ScottyM and ScottyT as if they were the same
+thing, but the M variants are type synonyms for the transformers with the inner
+types already set.
+
+```haskell
+newtype ScottyT e m a = ScottyT { runS :: State (ScottyState e m) a }
+    deriving ( Functor, Applicative, Monad )
+a is something like ActionT
+
+-- https://devtut.github.io/haskell/record-syntax.html
+-- https://en.wikibooks.org/wiki/Haskell/More_on_datatypes
+newtype ActionT e m a = ActionT { runAM :: ExceptT (ActionError e) (ReaderT ActionEnv (StateT ScottyResponse m)) a }
+    deriving ( Functor, Applicative, MonadIO )
+
+data ScottyState e m =
+    ScottyState { middlewares :: [Wai.Middleware]
+                , routes :: [Middleware m]
+                , handler :: ErrorHandler e m
+                , routeOptions :: RouteOptions
+                }
+instance Default (ScottyState e m) where
+    def = ScottyState [] [] Nothing def
+```
+
+Remember, ExceptT is another name for EitherT
+
+### MonadIO
+
+MonadIO is a different design than MonadTrans because rather than lifting
+through one layer at a time, MonadIO is intended to keep lifting your IO action
+until it is lifted over all structure embedded in the *outermost IO type*.
+
+You don’t have to lift multiple times if you’re trying to reach a base
+(outermost) Monad that happens to be IO, because you have liftIO.
+
+- https://hackage.haskell.org/package/base-4.16.1.0/docs/Control-Monad-IO-Class.html#t:MonadIO
+
+## Arrow
+
+- https://www.youtube.com/watch?v=W_NARxJEU5I&list=PLe7Ei6viL6jGp1Rfu0dil1JH1SHk9bgDV&index=37
+
+## Lens
+
+- <https://hackage.haskell.org/package/lens-tutorial-1.0.4/docs/Control-Lens-Tutorial.html>
+- <https://en.wikibooks.org/wiki/Haskell/Lenses_and_functional_references>
+- <https://www.youtube.com/watch?v=k-QwBL9Dia0>
+- <https://medium.com/javascript-inside/an-introduction-into-lenses-in-javascript-e494948d1ea5>
+
+> One use case that comes to mind is that we can pass a lens function around,
+enabling to retrieve values from a state object without having to know about how
+this object is actually structured. Another is that we never directly mutate our
+object or array but get a shallow copy in return.
+
+```haskell
+type Lens' s a = Functor f => (a -> f a) -> s -> f s
+data LensR s a = L { view :: s -> a
+                    , set :: a -> s -> s }
+
+-- Identity is a Functor
+newtype Identity a = Identity a -- Id :: a -> Identity a
+runIdentity :: Identity s -> s
+runIdentity (Identity x) = x
+instance Functor Identity where
+  fmap f (Identity x) = Identity (f x)
+
+--          ln      x    s
+set :: Lens' s a -> a -> s -> s
+set ln x s = runIdentity (ln set_fld s)
+  where set_fld :: a -> Identity a
+        set_fld _ = Identity x
+set' ln x = runIdentity . ln (Identity . const x)
+const :: a -> b -> a -- always returns the first argument
+
+over :: Lens' s a -> (a -> a) -> s -> s
+over ln f = runIdentity . ln (Identity . f)
+
+-- https://wiki.haskell.org/Phantom_type
+newtype Const v a = Const v
+getConst :: Const v a -> v
+getConst (Const x) = x
+instance Functor (Const v) where
+  fmap f (Const x) = Const x      -- don't use f
+
+view :: Lens' s a -> s -> a
+view ln s = getConst (ln     Const       s)
+--                       a -> Const a a
+view' ln = getConst . ln Const
+```
+
+## Miscellaneous
+
+### comma at beginning of line
+
+- <https://stackoverflow.com/questions/10483635/why-do-lots-of-programmers-move-commas-to-the-next-line>
+- <https://mail.haskell.org/pipermail/haskell-cafe/2006-July/016665.html>
+
+### Applied Structure
+
+- <https://grishaev.me/en/no-monads/>
+- <https://fsharpforfunandprofit.com/rop/>
+
+### Manage Project
+
+<https://stackoverflow.com/questions/30913145/what-is-the-difference-between-cabal-and-stack>
 
 Haskell programs are organized into modules. Modules contain the datatypes, type
 synonyms, typeclasses, typeclass instances, and values you’ve defined at the top
@@ -2017,11 +2636,6 @@ level.
 The Haskell Cabal, or Common Architecture for Building Applications and
 Libraries, is a package manager.
 
-## Testing
+### Testing
 
 No idea.
-
-## Applied Structure
-
-https://grishaev.me/en/no-monads/
-https://fsharpforfunandprofit.com/rop/
