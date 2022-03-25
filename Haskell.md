@@ -1,5 +1,10 @@
 # Haskell
 
+## Other References
+
+- https://news.ycombinator.com/item?id=13958491
+- https://github.com/epogrebnyak/haskell-intro
+
 ## Installation
 
 <https://wiki.archlinux.org/title/haskell>
@@ -2548,7 +2553,7 @@ instance Default (ScottyState e m) where
     def = ScottyState [] [] Nothing def
 ```
 
-Remember, ExceptT is another name for EitherT
+Remember, `ExceptT` is another name for `EitherT`.
 
 ### MonadIO
 

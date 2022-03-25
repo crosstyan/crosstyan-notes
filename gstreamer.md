@@ -1,12 +1,12 @@
 # GStreamer
 
-- [](https://github.com/thaytan/gst-tutorial-lca2018/blob/master/gstreamer-tutorial-lca2k18.pdf)
-- [](https://www.youtube.com/watch?v=ZphadMGufY8)
-- [](https://elinux.org/images/3/39/Celinux-gst-tutorial.pdf)
-- [](https://riptutorial.com/gstreamer/example/28136/saving-application-generated-media-to-file)
-- [](https://www.youtube.com/watch?v=MCRKfXipAkU)
-- [](http://www.ulduzsoft.com/2016/06/qtmultimedia-ffmpeg-gstreamer-comparing-multimedia-frameworks/)
-- [](https://docs.opencv.org/3.4/d4/d15/group__videoio__flags__base.html#ga023786be1ee68a9105bf2e48c700294d)
+- <https://github.com/thaytan/gst-tutorial-lca2018/blob/master/gstreamer-tutorial-lca2k18.pdf>
+- <https://www.youtube.com/watch?v=ZphadMGufY8>
+- <https://elinux.org/images/3/39/Celinux-gst-tutorial.pdf>
+- <https://riptutorial.com/gstreamer/example/28136/saving-application-generated-media-to-file>
+- <https://www.youtube.com/watch?v=MCRKfXipAkU>
+- <http://www.ulduzsoft.com/2016/06/qtmultimedia-ffmpeg-gstreamer-comparing-multimedia-frameworks/>
+- <https://docs.opencv.org/3.4/d4/d15/group__videoio__flags__base.html#ga023786be1ee68a9105bf2e48c700294d>
 
 | Enumerator                                   | Description
 |----------------------------------------------|---------------------------------------------------------------------|
