@@ -2228,6 +2228,32 @@ What we’re trying to highlight here is that Reader is not always Reader,
 sometimes it’s the ambient Applicative or Monad associated with the partially
 applied function type, here that is `r ->`.
 
+### Useful Liinks on Reader
+
+- https://www.quora.com/What-is-the-simplest-way-to-understand-the-Reader-and-State-monad-in-Haskell
+- https://engineering.dollarshaveclub.com/the-reader-monad-example-motivation-542c54ccfaa8
+- https://mmhaskell.com/monads/reader-writer
+- https://blog.ssanj.net/posts/2014-09-23-A-Simple-Reader-Monad-Example.html
+
+```haskell
+tom :: Reader String String
+-- tom = do 
+--   env <- ask
+--   return $ env ++ " Tom"
+tom = ask >>= \env -> return $ env ++ " Tom"
+
+str = runReader tom "this is env"
+
+tom' :: String -> String
+tom' env = env ++ " Tom"
+
+str' = tom' "this is env"
+```
+
+### Writer is not mutable thingy
+
+It just a tuple working with Monoid and `<>` operator.
+
 ## State
 
 - <https://en.wikibooks.org/wiki/Haskell/Understanding_monads/State>
@@ -2345,6 +2371,39 @@ combineRoll = do
 -- randomIO is something not pure/magic.
 -- so we must wrap it in a monad (MonadIO)
 -- https://stackoverflow.com/questions/7314789/how-to-take-out-a-value-out-of-a-monad-in-haskell
+```
+
+### Golf Game
+
+Imagine that you’re on the first hole of a golf course, and you swing at a ball three times, with these results:
+
+- The first ball goes 20 yards
+- The second ball goes 15 yards
+- The third swing is a “swing and a miss,” so technically the ball goes 0 yards
+- The fourth ball goes 200 yards
+
+```haskell
+swing :: Distance ->[Total] -> (Total, [Total])
+swing n s = case s of
+  [] -> (n, [n])
+  -- x:xs -> (n + x, (n+x):s)
+  x:xs -> (n + x, [n+x, x]) -- if you just care about previous value/state
+
+swing' n = state $ swing n
+
+finalState :: (Total, [Total])
+finalState = runState (do 
+  swing' 20
+  swing' 15
+  swing' 0
+  swing' 200) []
+
+finalValue :: Total
+finalValue = evalState (do 
+  swing' 20
+  swing' 15
+  swing' 0
+  swing' 200) []
 ```
 
 ## Composing types
