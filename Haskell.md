@@ -2375,12 +2375,16 @@ combineRoll = do
 
 ### Golf Game
 
+> Example from the book: Functional Programming Simplified (Scala Edition)
+
 Imagine that you’re on the first hole of a golf course, and you swing at a ball three times, with these results:
 
 - The first ball goes 20 yards
 - The second ball goes 15 yards
 - The third swing is a “swing and a miss,” so technically the ball goes 0 yards
 - The fourth ball goes 200 yards
+
+Thinking of state as pushing onto a list
 
 ```haskell
 type Distance = Int
@@ -2389,10 +2393,13 @@ type Total = Int
 swing :: Distance ->[Total] -> (Total, [Total])
 swing n s = case s of
   [] -> (n, [n])
-  -- x:xs -> (n + x, (n+x):s)
-  x:xs -> (n + x, [n+x, x]) -- if you just care about previous value/state
+  x:xs -> (n + x, (n+x):s)
+  -- x:xs -> (n + x, [n+x, x]) -- if you just care about previous value/state
 
 swing' n = state $ swing n
+
+-- StateT is like the builder design pattern in OOP
+-- Transform a State to new State
 
 finalState :: (Total, [Total])
 finalState = runState (do 
@@ -2430,6 +2437,10 @@ Monad instances defined. *However, the result of having done so does not give yo
 
 ## Monad Transformer
 
+> “It turns out that for theoretical reasons, we can’t just take any two monads
+M1 and M2 and combine them into another monad M3. It’s not possible.”  
+[John De Goes writes in his LambdaConf 2014 project notes](https://github.com/jdegoes/lambdaconf-2014-introgame)
+
 We’ve now seen what the problem with Monad is: you can put two together but you
 don’t get a new Monad instance out of it.  When we need to get a new Monad
 instance, we need a monad transformer. It’s not magic; the answer is in the
@@ -2446,9 +2457,9 @@ type argument which is assumed to have a Monad instance.
 The transformer variant of a type gives us a Monad instance that binds over both
 bits of structure. This allows us to compose monads and combine their effects.
 
--- https://www.youtube.com/watch?v=SMj-n2f7wYY
--- https://github.com/TheWizardTower/monadTransformers
--- https://www.youtube.com/watch?v=j3Kl0t07TRc
+- https://www.youtube.com/watch?v=SMj-n2f7wYY
+- https://github.com/TheWizardTower/monadTransformers
+- https://www.youtube.com/watch?v=j3Kl0t07TRc
 
 ```haskell
 newtype IdentityT f a = IdentityT { runIdentityT :: f a }
