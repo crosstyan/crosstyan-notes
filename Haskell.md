@@ -2383,6 +2383,9 @@ Imagine that you’re on the first hole of a golf course, and you swing at a bal
 - The fourth ball goes 200 yards
 
 ```haskell
+type Distance = Int
+type Total = Int
+
 swing :: Distance ->[Total] -> (Total, [Total])
 swing n s = case s of
   [] -> (n, [n])
