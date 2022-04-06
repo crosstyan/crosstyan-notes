@@ -533,3 +533,40 @@ Use `sizeof` to get the size of a structure.
 - https://stackoverflow.com/questions/346536/difference-between-a-structure-and-a-union
 
 Just like type Union. You should only use one of its "member" at the same time.
+
+## Lambda
+
+https://www.reddit.com/r/cpp_questions/comments/8gav1g/lambdas_vs_function_pointers_discussion/
+
+```cpp
+int i = 42;
+auto lambda = [&i](int j) { return i + j; };
+std::cout << lambda(10);
+```
+
+```cpp
+class Lambda {
+public:
+    Lambda(const int& i) : i(i) { }
+    auto operator()(int j) { return i + j; }
+private:
+    const int& i;
+};
+
+int i = 42;
+auto lambda = Lambda(i); // i is captured by reference, which is a class initializer
+std::cout << lambda(10);
+```
+
+## Event Driven
+
+libuv?
+
+- https://stackoverflow.com/questions/11423426/how-does-libuv-compare-to-boost-asio
+- https://github.com/ReactiveX/RxCpp
+- https://github.com/wqking/eventpp
+- https://github.com/libevent/libevent
+- https://cpp.libhunt.com/libuv-alternatives
+- https://github.com/libuv/libuv
+- https://nikhilm.github.io/uvbook/threads.html
+- https://nomoshen.com/2021/08/01/%E5%BC%82%E6%AD%A5%E7%B3%BB%E5%88%972-asio%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/

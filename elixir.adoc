@@ -72,3 +72,289 @@ parameters by using the syntax param `\\` value.
 ## Specs
 
 - https://hexdocs.pm/elixir/1.13/typespecs.html#the-string-type[Typespecs — Elixir v1.13.1]
+
+## BEAM
+
+Originally BEAM was short for Bogdan's Erlang Abstract Machine, named after
+Bogumil "Bogdan" Hausman, who wrote the original version, but the name may also
+be referred to as Björn's Erlang Abstract Machine, after Björn Gustavsson, who
+wrote and maintains the current version.
+
+Unlike OS processes or threads, BEAM processes are lightweight concurrent
+entities handled by the VM, which uses its own scheduler to manage their
+concurrent execution.
+
+By default, BEAM uses as many schedulers as there are CPU cores available. For
+example, on a quad-core machine, four schedulers are used.
+
+If you don't want receive to block, you can specify the after clause, which is
+executed if a message isn't received in a given time frame (in milliseconds)
+
+```elixir
+receive do 
+    message -> IO.puts "received message"
+  after
+    5000 -> IO.puts "Timeout"
+end
+```
+
+### State
+
+Use parameter of your recursive function to store the state of the computation.
+
+```elixir
+defmodule TodoServer do
+  def start do
+    spawn(fn -> loop(TodoList.new()) end) # TodoList.new() returns a new TodoList
+  end
+
+  defp loop(todo_list) do
+    new_todo_list = receive do
+      message -> process_message(todo_list, message)
+    end
+    loop(new_todo_list)
+  end
+end
+```
+
+For example, if you're implementing a web server that manages multiple to-do
+lists, you most likely have one server process for each to-do list. While
+handling an HTTP request, you can find the corresponding to-do server and have
+it run the requested operation. Each to-do list manipulation runs concurrently,
+thus making your server scalable and more performant.
+
+Moreover, there are no synchronization problems, because each to-do list is
+managed in a dedicated process.
+
+Our handler functions get passed the current state (as their last parameter),
+and they return (among other things) a potentially updated state. Whatever state
+a function returns is the state that will be passed to the next request handler.
+
+### A process is sequential
+
+although multiple processes may run in parallel, a single process is always
+sequential — it either runs some code or waits for a message. If many processes
+send messages to a single process, that single process can significantly
+affect overall throughput.
+
+### Unlimited process mailboxes
+
+Theoretically, a process mailbox has an unlimited size.  How can you resolve
+this problem? For each server process, you should introduce a match-all receive
+clause that deals with unexpected kinds of messages.
+
+[quote]
+m:_n_ threading: a small number of schedulers running a large number of BEAM processes
+
+### Agent
+
+Elixir modules are basically buckets of functions—they cannot hold state. But
+processes can hold state. And Elixir comes with a library module called `Agent`
+that makes it easy to wrap a process containing state in a nice module
+interface.
+
+## Generic Server Processes
+
+https://hexdocs.pm/elixir/1.13/GenServer.html[GenServer]
+
+GenServer, a `behaviour` that allows us to automate the details of creating a
+stateful actor.
+
+A behaviour is very similar to an interface in Java. It defines a set of functions.
+A module specifies that it implements a behaviour with `use`
+
+When we write an OTP server, we write a module containing one or more callback
+functions with standard names. OTP will invoke the appropriate callback to
+handle a particular situation.
+
+The generic code drives the entire process, and the specific implementation
+must fill in the missing pieces.
+
+1. Make the generic code accept a plug-in module as the argument. That module is
+called a *callback* module.
+2. Maintain the module atom as part of the process state.
+3. Invoke callback-module functions when needed.
+
+### impl
+
+https://hexdocs.pm/elixir/main/Module.html#module-impl[Module.impl]
+
+You can mark what functions in a module are implementations of a callback using the `@impl` attribute. 
+
+`@impl` helps with maintainability by making it clear to other developers that the function is implementing a callback.
+
+This example is from *Elixir in Action* 6.1.2 with typespecs
+
+```elixir
+defmodule ServerProcess do
+  # @callback indicates that the Module will require certain callback functions
+  # which has better use @impl and @behaviour
+
+  ## https://elixirforum.com/t/parametric-generics-shrinking-and-negation-in-typespecs/38382/3
+  ## dumb Dialzer can't tell what the a is. term() is alias for any().
+  ## type a should be the same type as current_state and next_state
+  @callback init::a when a: term()
+
+  ## return {resp, new_state}
+  @callback handle_call(req::any, current_state::a)::{b, a} when a: term(), b: term()
+
+  @spec start(module) :: pid
+  def start(callback_module) do
+    spawn(fn ->
+      init_state = callback_module.init()
+      loop(callback_module, init_state)
+    end)
+  end
+
+  ## param a is the same as callback init returns
+  @spec loop(module, a) :: no_return when a: term()
+  defp loop(callback_module, current_state) do
+    receive do
+      {req, caller} ->
+        {resp, new_state} = callback_module.handle_call(req, current_state)
+        send(caller, {:resp, resp})
+        loop(callback_module, new_state)
+    end
+  end
+
+  # return is the same as handle_call callback
+  @spec call(pid, a) :: b when a:term(), b: term()
+  def call(server_pid, req) do
+    send(server_pid, {req, self()})
+    receive do
+      {:resp, resp} ->
+        resp
+    end
+  end
+end
+
+defmodule KVStore do
+  @behaviour ServerProcess
+
+  @impl true
+  @spec init :: %{}
+  def init() do
+    %{}
+  end
+
+  # handle :put
+  @impl true
+  @spec handle_call(req, map) :: {res, map} when req: {:put, String.t, b} | {:get, String.t}, res: :ok | b, b: term()
+  def handle_call({:put, key, value}, state) do
+    {:ok, Map.put(state, key, value)}
+  end
+
+  @impl true
+  def handle_call({:get, key}, state) do
+    {Map.get(state, key), state}
+  end
+
+  @spec start :: pid
+  def start do
+    ServerProcess.start(KVStore)
+  end
+
+  # you only get resp. can't get state
+  @spec put(pid, String.t, any) :: :ok
+  def put(pid, key, value) do
+    ServerProcess.call(pid, {:put, key, value})
+  end
+
+  @spec get(pid, String.t) :: b when b: term()
+  def get(pid, key) do
+    ServerProcess.call(pid, {:get, key})
+  end
+end
+```
+
+A slightly better version. It's still Anyscript because compiler won't check.
+But at least it has consistency.
+
+```elixir
+defmodule ServerProcess do
+  # @callback indicates that the Module will require certain callback functions
+  # which has better use @impl and @behaviour
+
+  ## https://elixirforum.com/t/parametric-generics-shrinking-and-negation-in-typespecs/38382/3
+  ## dumb Dialzer can't tell what the a is. term() is alias for any().
+  ## type a should be the same type as current_state and next_state
+
+  @type state :: term()
+  @type req   :: term()
+  @type res   :: term()
+
+  @callback init::state
+
+  ## return {resp, new_state}
+  @callback handle_call(req::req, current_state::state)::{res, state}
+
+  @spec start(module) :: pid
+  def start(callback_module) do
+    spawn(fn ->
+      init_state = callback_module.init()
+      loop(callback_module, init_state)
+    end)
+  end
+
+  ## param a is the same as callback init returns
+  @spec loop(module, state) :: no_return
+  defp loop(callback_module, current_state) do
+    receive do
+      {req, caller} ->
+        {resp, new_state} = callback_module.handle_call(req, current_state)
+        send(caller, {:resp, resp})
+        loop(callback_module, new_state)
+    end
+  end
+
+  # return is the same as handle_call callback
+  @spec call(pid, req) :: res
+  def call(server_pid, req) do
+    send(server_pid, {req, self()})
+    receive do
+      {:resp, resp} ->
+        resp
+    end
+  end
+end
+
+defmodule KVStore do
+  @behaviour ServerProcess
+  @type value::term()
+
+  @impl true
+  @spec init :: %{}
+  def init() do
+    %{}
+  end
+
+  # handle :put
+  @impl true
+  @spec handle_call(req, map) :: {res, map} when req: {:put, String.t, value} | {:get, String.t}, res: :ok | value
+  def handle_call({:put, key, value}, state) do
+    {:ok, Map.put(state, key, value)}
+  end
+
+  @impl true
+  def handle_call({:get, key}, state) do
+    {Map.get(state, key), state}
+  end
+
+  @spec start :: pid
+  def start do
+    ServerProcess.start(KVStore)
+  end
+
+  # you only get resp. can't get state
+  @spec put(pid, String.t, any) :: :ok
+  def put(pid, key, value) do
+    ServerProcess.call(pid, {:put, key, value})
+  end
+
+  @spec get(pid, String.t) :: value
+  def get(pid, key) do
+    ServerProcess.call(pid, {:get, key})
+  end
+end
+
+```

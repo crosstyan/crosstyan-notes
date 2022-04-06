@@ -2457,6 +2457,11 @@ type argument which is assumed to have a Monad instance.
 The transformer variant of a type gives us a Monad instance that binds over both
 bits of structure. This allows us to compose monads and combine their effects.
 
+> Unless you’re interested in theory, don’t get too caught up in how Monad and
+`StateT` are implemented. By that I mean that you should first focus on how to use
+`StateT`, and after that, if you want to know how to write Monad and `StateT` you
+can dig into that source code.
+
 - https://www.youtube.com/watch?v=SMj-n2f7wYY
 - https://github.com/TheWizardTower/monadTransformers
 - https://www.youtube.com/watch?v=j3Kl0t07TRc
@@ -2689,6 +2694,18 @@ view :: Lens' s a -> s -> a
 view ln s = getConst (ln     Const       s)
 --                       a -> Const a a
 view' ln = getConst . ln Const
+```
+
+## Beyond Haskell
+
+### Idris
+
+```idris
+(++) : Vect 3 Integer -> Vect 2 Integer -> Vect 5 Integer
+
+(++) : Vect n a -> Vect m a -> Vect (n + m) a
+(++) Nil ys = ys
+(++) (x :: xs) ys = x :: xs ++ ys
 ```
 
 ## Miscellaneous
