@@ -153,29 +153,7 @@ processes can hold state. And Elixir comes with a library module called `Agent`
 that makes it easy to wrap a process containing state in a nice module
 interface.
 
-## Generic Server Processes
-
-https://hexdocs.pm/elixir/1.13/GenServer.html[GenServer]
-
-GenServer, a `behaviour` that allows us to automate the details of creating a
-stateful actor.
-
-A behaviour is very similar to an interface in Java. It defines a set of functions.
-A module specifies that it implements a behaviour with `use`
-
-When we write an OTP server, we write a module containing one or more callback
-functions with standard names. OTP will invoke the appropriate callback to
-handle a particular situation.
-
-The generic code drives the entire process, and the specific implementation
-must fill in the missing pieces.
-
-1. Make the generic code accept a plug-in module as the argument. That module is
-called a *callback* module.
-2. Maintain the module atom as part of the process state.
-3. Invoke callback-module functions when needed.
-
-### impl
+## impl
 
 https://hexdocs.pm/elixir/main/Module.html#module-impl[Module.impl]
 
@@ -184,88 +162,6 @@ You can mark what functions in a module are implementations of a callback using 
 `@impl` helps with maintainability by making it clear to other developers that the function is implementing a callback.
 
 This example is from *Elixir in Action* 6.1.2 with typespecs
-
-```elixir
-defmodule ServerProcess do
-  # @callback indicates that the Module will require certain callback functions
-  # which has better use @impl and @behaviour
-
-  ## https://elixirforum.com/t/parametric-generics-shrinking-and-negation-in-typespecs/38382/3
-  ## dumb Dialzer can't tell what the a is. term() is alias for any().
-  ## type a should be the same type as current_state and next_state
-  @callback init::a when a: term()
-
-  ## return {resp, new_state}
-  @callback handle_call(req::any, current_state::a)::{b, a} when a: term(), b: term()
-
-  @spec start(module) :: pid
-  def start(callback_module) do
-    spawn(fn ->
-      init_state = callback_module.init()
-      loop(callback_module, init_state)
-    end)
-  end
-
-  ## param a is the same as callback init returns
-  @spec loop(module, a) :: no_return when a: term()
-  defp loop(callback_module, current_state) do
-    receive do
-      {req, caller} ->
-        {resp, new_state} = callback_module.handle_call(req, current_state)
-        send(caller, {:resp, resp})
-        loop(callback_module, new_state)
-    end
-  end
-
-  # return is the same as handle_call callback
-  @spec call(pid, a) :: b when a:term(), b: term()
-  def call(server_pid, req) do
-    send(server_pid, {req, self()})
-    receive do
-      {:resp, resp} ->
-        resp
-    end
-  end
-end
-
-defmodule KVStore do
-  @behaviour ServerProcess
-
-  @impl true
-  @spec init :: %{}
-  def init() do
-    %{}
-  end
-
-  # handle :put
-  @impl true
-  @spec handle_call(req, map) :: {res, map} when req: {:put, String.t, b} | {:get, String.t}, res: :ok | b, b: term()
-  def handle_call({:put, key, value}, state) do
-    {:ok, Map.put(state, key, value)}
-  end
-
-  @impl true
-  def handle_call({:get, key}, state) do
-    {Map.get(state, key), state}
-  end
-
-  @spec start :: pid
-  def start do
-    ServerProcess.start(KVStore)
-  end
-
-  # you only get resp. can't get state
-  @spec put(pid, String.t, any) :: :ok
-  def put(pid, key, value) do
-    ServerProcess.call(pid, {:put, key, value})
-  end
-
-  @spec get(pid, String.t) :: b when b: term()
-  def get(pid, key) do
-    ServerProcess.call(pid, {:get, key})
-  end
-end
-```
 
 A slightly better version. It's still Anyscript because compiler won't check.
 But at least it has consistency.
@@ -279,6 +175,7 @@ defmodule ServerProcess do
   ## dumb Dialzer can't tell what the a is. term() is alias for any().
   ## type a should be the same type as current_state and next_state
 
+  # I don't care what the type it is but it has to be consistent type
   @type state :: term()
   @type req   :: term()
   @type res   :: term()
@@ -356,5 +253,92 @@ defmodule KVStore do
     ServerProcess.call(pid, {:get, key})
   end
 end
+```
+
+We will also call `@impl` Plugging into. Or like Haskell `instance` or `trait` in Rust (not quite the same though).
+Elixir's module is more like an Class.
+
+Instead of classed, we have in Elixir. Consider modules a collection of
+functions. Each is available to your whole application, and its functions can be
+called from anywhere. It's all `public`, `static` and stateless.
+
+### Optional Callback
+
+Many functions are automatically included in the module due to use GenServer.
+These are all callback functions that need to be implemented for you to plug
+into the GenServer behaviour.
+
+Of course, you can then override the default implementation of each function as
+required. If you define a function of the same name and arity in your module, it
+will overwrite the default implementation you get through use.
+
+## Generic Server Processes
+
+https://hexdocs.pm/elixir/1.13/GenServer.html[GenServer]
+
+GenServer, a `behaviour` that allows us to automate the details of creating a
+stateful actor.
+
+A behaviour is very similar to an interface in Java. It defines a set of functions.
+A module specifies that it implements a behaviour with `use`
+
+When we write an OTP server, we write a module containing one or more callback
+functions with standard names. OTP will invoke the appropriate callback to
+handle a particular situation.
+
+The generic code drives the entire process, and the specific implementation
+must fill in the missing pieces.
+
+1. Make the generic code accept a plug-in module as the argument. That module is
+called a *callback* module.
+2. Maintain the module atom as part of the process state.
+3. Invoke callback-module functions when needed.
+
+A Module implements behaviour in GenServer like ServerProcess above
+
+```elixir
+defmodule KeyValueStore do
+  use GenServer
+  # https://hexdocs.pm/elixir/1.13/GenServer.html#c:init/1
+
+  @impl true
+  def init(_) do
+    {:ok, %{}}
+  end
+
+  # https://hexdocs.pm/elixir/1.13/GenServer.html#c:handle_cast/2
+  @impl true
+  def handle_cast({:put, key, value}, state) do
+    {:noreply, Map.put(state, key, value)}
+  end
+
+  # https://hexdocs.pm/elixir/1.13/GenServer.html#c:handle_call/3
+  @impl true
+  def handle_call({:get, key}, _from, state) do
+    {:reply, Map.get(state, key), state}
+  end
+
+  @spec start :: :ignore | {:error, any} | {:ok, pid}
+  def start do
+    # https://dockyard.com/blog/2017/08/15/elixir-tips
+    # you can replace KeyValueStore with __MODULE__
+    GenServer.start(KeyValueStore, nil)
+  end
+
+  @spec put(pid, String.t, value) :: :ok when value: term()
+  def put(pid, key, value) do
+    GenServer.cast(pid, {:put, key, value})
+  end
+
+  @spec get(pid, String) :: value when value: term()
+  def get(pid, key) do
+    GenServer.call(pid, {:get, key})
+  end
+end
 
 ```
+
+## Protocols
+
+- https://elixir-lang.org/getting-started/protocols.html[Protocols]
+- https://medium.com/elixirlabs/polymorphism-in-elixir-cd0c765b6929[Polymorphism in Elixir]
