@@ -100,7 +100,7 @@
 (defn factorial' [n]
   (cond
     (= n 1) 1
-    :else   (* n (factorial (- n 1)))))
+    :else   (* n (factorial' (- n 1)))))
 
 (defn factorial [n]
   (let [go (fn [n acc]
@@ -212,7 +212,7 @@
 (defn calc-pt-middle [last]
   (cond
     (empty? (rest last)) '()
-    :else         (cons (+ (first last) (first (rest last))) (calc-middle (rest last)))))
+    :else         (cons (+ (first last) (first (rest last))) (calc-pt-middle (rest last)))))
 
 (calc-pt-middle '(1 1))
 (calc-pt-middle '(1 2 1))
