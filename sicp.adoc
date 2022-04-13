@@ -1,0 +1,392 @@
+# SICP
+:stem: latexmath
+
+> Pascal is for building pyramids—imposing, breathtaking, static structures
+built by armies pushing heavy blocks into place. Lisp is for building
+organisms—imposing, breathtaking, dynamic structures built by squads fitting
+fluctuating myriads of simpler organisms into place.
+
+> It is better to have 100 functions operate on one data
+structure than to have 10 functions operate on 10 data structures.
+
+> a computer language is not just a way of getting a computer to perform
+operations but rather that it is a novel formal medium for expressing ideas
+about methodology.
+Thus, programs must be written for people to read, and only incidentally for
+machines to execute.
+
+> We control complexity by building abstractions that hide details
+when appropriate.
+We control complexity by establishing conventional interfaces that enable us to
+construct systems by combining standard, well-understood pieces in a "mix and
+match" way.
+We control complexity by establishing new languages for describing a design,
+each of which emphasizes particular aspects of the design and deemphasizes
+others.
+
+> "computer science" is not a science and that its significance has little to do
+with computers.
+
+> From Algol we take *lexical scoping* and *block structure*, which are gifts from
+the pioneers of programming-language design who were on the Algol committee.
+
+## Building Abstractions with Procedures
+
+> The most significant of these features is the fact that Lisp descriptions of
+processes, called procedures, can themselves be represented and manipulated as
+Lisp data.
+Lisp's flexibility in handling procedures as data makes it one of the most
+convenient languages in existence for exploring these techniques.
+
+### The Elements of Programming
+
+Every powerful language has three mechanisms for accomplishing this
+
+- Primitive Expressions
+- Means of Combination
+- Means of Abstraction
+
+In programming, we deal with two kinds of elements: procedures and data. (Later
+we will discover that they are really not so distinct.)
+
+
+#### Naming and the Environment
+
+A critical aspect of a programming language is the means it provides
+for using names to refer to computational objects. We say that the name
+identifies a *variable* whose value is the *object*.
+
+```clojure
+(def size 2)
+```
+
+Indeed, complex programs are constructed by building, step by step,
+computational objects of increasing complexity.
+
+*Environment* It should be clear that the possibility of associating values with
+*symbols and later retrieving them means that the interpreter must maintain
+some sort of memory that keeps track of the name-object pairs.
+
+This memory is called the environment (more precisely the global environment,
+since we will see later that a computation may involve a number of different
+environments).
+
+This notion of environment is crucial, both for understanding how the
+interpreter works and for implementing interpreters.
+
+#### Evaluating Combination
+
+1. Evaluate the subexpression of the combination
+2. Apply the procedure that is the value of the leftmost subexpression
+(the operator) to the arguments that are the values of the other subexpressions (the operands)
+
+The key point to notice is the role of the environment in determining the
+meaning of the symbols in expressions.
+
+Evaluating `(def x 3)` does not apply define to two arguments, one of which is
+the value of the symbol x and the other of which is 3, since the purpose of the
+define is precisely to associate x with a value. (That is, `(def x 3)` is not a
+combination.)
+
+Such exceptions to the general evaluation rule are called *special forms*.
+
+```clojure
+(defn square [x] (* x x))
+```
+
+We have here a compound procedure, which has been given the name square.
+
+In this case, the interpreter evaluates each expression in the sequence in turn and returns the
+value of the final expression as the value of the procedure application.
+
+```text
+(defn <name> [<formal parameters>] <body>)
+```
+
+```clojure
+(defn sum-of-squares [x y] (+ (square x) (square y)))
+```
+
+#### The Substitution Model for Procedure Application
+
+Typical interpreters do not evaluate procedure applications by manipulating
+the text of a procedure to sub- stitute values for the formal parameters. In
+practice, the "substitution" is accomplished by using a local environment for
+the formal parameters.
+
+This "fully expand and then reduce" evaluation method is known as *normal-order*
+evaluation, in contrast to the "evaluate the arguments and then apply" method
+that the interpreter actually uses, which is called *applicative-order*
+evaluation.
+
+https://stackoverflow.com/questions/4634542/eager-evaluation-applicative-order-and-lazy-evaluation-normal-order
+
+#### Conditional Expressions
+
+```clojure
+(cond <p1> <e1>
+      <p2> <e2>
+      ;;...
+      <pn> <en>)
+
+(defn abs [x]
+  (cond 
+    (< x 0) (- x)
+    :else   x))
+```
+
+The first expression in each pair is a *predicate* - that is, an expression whose
+value is interpreted as either true or false.
+
+```clojure
+(if <predicate> <consequent> <alternative>)
+```
+
+Logical composition operations. Boolean Algebra `and` and `or` and `not`
+
+Declarative and imperative descriptions are intimately related, as indeed are
+mathematics and computer science.
+
+In a related vein, an important current area in programming-language design is
+the exploration of so-called very high-level languages, in which one actually
+programs in terms of declarative statements.
+
+The idea is to make interpreters sophisticated enough so that, given "what is"
+knowledge specified by the programmer, they can generate “how to” knowledge
+automatically.
+
+Alyssa P. Hacker (a pun on "A LISP hacker: LISP is an acronym for "List
+Processing Language" - so named because the list is one of the primary data
+structures in the language.") is used to demonstrate the correct approach to
+solving problems, while her counterpart, Ben Bitdiddle, is used to demonstrate
+flawed designs. https://www.quora.com/Who-is-Alyssa-P-Hacker-and-why-is-she-famous[Who is Alyssa P. Hacker, and why is she famous?]
+
+#### Procedures as Black Boxes Abstraction
+
+The entire sqrt program can be viewed as a cluster of procedures that mirrors
+the decomposition of the problem into subproblems.
+
+It is crucial that each procedure accomplishes an identifiable task that can be
+used as a module in defining other procedures.
+
+...so-called procedural abstraction. At this level of abstraction, any procedure
+that computes the square is equally good.
+
+##### Local Names
+
+https://en.wikipedia.org/wiki/Referential_transparency[Referential transparency]
+
+```clojure
+(defn good-enough? [guess x]
+  (< (abs (- (square guess) x)) 0.001))
+```
+
+Running the procedure square must not affect the value of `x` that is used by
+`good-enough?`, because that value of x may be needed by `good-enough?` after square
+is done computing.
+
+A formal parameter of a procedure has a very special role in the procedure
+definition, in that it doesn't matter what name the formal parameter has. Such a
+name is called a *bound variable*, and we say that the procedure definition binds
+its formal parameters.
+
+If a variable is not bound, we say that it is free.
+
+The set of expressions for which a binding defines a name is called the scope of
+that name.
+
+In a procedure definition, the bound variables declared as the formal parameters
+of the procedure have the body of the procedure as their scope.
+
+In the definition of `good-enough?` above, `guess` and `x` are bound
+variables but `<`, `-`, `abs`, and `square` are free.
+
+It surely depends upon the fact (external to this definition) that the symbol
+`abs` names a procedure for computing the absolute value of a number.
+
+https://stackoverflow.com/questions/4578574/what-is-the-difference-between-lisp-1-and-lisp-2[Clojure is a Lisp-1]
+
+> No letrec, labels or flet - use (fn name [args]…​) for self-reference, letfn for mutual reference. https://clojure.org/reference/lisps[Differences with other Lisps]
+
+>  In Clojure, all defs are global scope. All. Including the defs here inside your function some-function body. 
+
+> Lexical scoping dictates that free variables in a procedure are taken to refer to
+bindings made by enclosing procedure definitions;
+that is, they are looked up in the environment in which the procedure was defined.
+
+clojure let is like C89. All declaration must in the top of expression. `define` in Scheme is scoped. 
+
+https://stackoverflow.com/questions/53637079/when-to-use-define-and-when-to-use-let-in-racket[When to use define and when to use let in racket]
+
+> Embedded definitions must come first in a procedure body. The management is not
+responsible for the consequences of running programs that intertwine definition
+and use.
+
+## Procedures and the Processes They Generate
+
+### Linear Recursion and Iteration
+
+```clojure
+(defn factorial [n]
+  (cond
+    (= n 1) 1
+    :else   (* n (factorial (- n 1)))))
+```
+```clojure
+(factorial 6)
+(* 6 (factorial 5))
+(* 6 (* 5 (factorial 4)))
+(* 6 (* 5 (* 4 (factorial 3))))
+(* 6 (* 5 (* 4 (* 3 (factorial 2)))))
+(* 6 (* 5 (* 4 (* 3 (* 2 (factorial 1))))))
+(* 6 (* 5 (* 4 (* 3 (* 2 1)))))
+(* 6 (* 5 (* 4 (* 3 2))))
+(* 6 (* 5 (* 4 6)))
+(* 6 (* 5 24))
+(* 6 120)
+720
+```
+
+```clojure
+(defn factorial [n]
+  (let [go (fn [n acc]
+             (cond
+               (= n 1) acc
+               :else   (recur (- n 1) (* acc n))))]
+    (go n 1)))
+```
+
+```clojure
+(factorial 6)
+(go 6 1)
+(go 5 (* 6 1))
+(go 4 (* 5 6 1))
+(go 3 (* 4 5 6 1))
+(go 2 (* 3 4 5 6 1))
+(go 1 (* 2 3 4 5 6 1))
+(* 2 3 4 5 6 1)
+720
+```
+
+More formally, we maintain a running product, together with
+a counter that counts from 1 up to `n`.
+
+On the other hand, when we consider the 'shapes' of the two processes, we
+find that they evolve quite differently.
+
+Consider the first process.Carrying out this process requires that the interpreter keep track of the
+operations to be performed later on. (Recursive Process)
+
+In this case there is some additional "hidden" information, maintained by the
+interpreter and not contained in the program variables, which indicates "where
+the process is" in negotiating the chain of deferred operations.
+
+The longer the chain, the more information must be maintained.
+
+Realizing a recursive process requires a machine that uses an
+auxiliary data structure known as a *stack*.
+
+By contrast, the second process does not grow and shrink.
+Such a process is called a linear iterative process.
+
+### Tree Recursion
+
+```clojure
+(defn fib [n]
+  (cond
+    (= n 0) 0
+    (= n 1) 1
+    :else   (+ (fib (- n 1))
+               (fib (- n 2)))))
+```
+
+This procedure is instructive as a prototypical tree recursion, but it is a
+terrible way to compute Fibonacci numbers because it does so much redundant
+computation.
+
+```clojure
+(defn fib' [n]
+  (let [go (fn [a b count]
+             (cond
+               (= count 0) b
+               :else       (recur (+ a b) a (- count 1))))]
+    (go 1 0 n)))
+```
+
+The difference in number of steps required by the two methods: one linear in `n`,
+one growing as fast as `Fib(n)` itself, which is enormous, even for small inputs. (unless using caching)
+
+When we consider processes that operate on hierarchically structured data rather
+than numbers, we will find that tree recursion is a natural and powerful tool.
+
+*Counting change*
+
+It is not obvious how to design a better algorithm for computing the result, and
+we leave this problem as a challenge. The observation that a tree-recursive
+process may be highly inefficient but often easy to specify and understand has led
+people to propose that one could get the best of both worlds by designing a
+"smart compiler" that could transform tree-recursive procedures into more
+efficient procedures that compute the same result.
+
+### Order of Growth
+
+Big-O notation is a way of describing the growth of a function.
+
+### Exponentional
+
+stem:[b^n = b \cdot b^{n-1}]
+
+stem:[b^0 = 1]
+
+## Formulating Abstractions with High-Order Procedures
+
+stem:[\sum_{n=a}^b f(n) = f(a) + \dots + f(b)]
+
+```clojure
+(defn <name> [a b]
+  (cond
+    (> a b) 0
+    :else   (+  (<term> a)
+                (<name> (<next> a) b))))
+```
+
+`<term>` is f
+
+The presence of such a common pattern is strong evidence that there is
+a useful abstraction waiting to be brought to the surface.
+
+Newton Method. Finding fixed points of functions, finding roots of equations by the half-interval method.
+
+Skip the rest of chapter because I don't want to be a math student.
+
+## Building Abstractions with Data
+
+We saw how to use primitive data (numbers) and primitive operations (arithmetic
+operations), how to combine procedures to form compound procedures through
+composition, conditionals, and the use of parameters, and how to abstract
+procedures by using `define`.
+
+higher-order procedures.
+
+All the procedures in chapter 1 operate on simple numerical data, and simple
+data are not sufficient for many of the problems we wish to address using
+computation.
+
+> building abstractions by combining data objects to form compound data.
+
+It would be much better if we could "glue together" a numerator and denominator
+to form a pair—a compound data object - that our programs could manipulate in a
+way that would be consistent with regarding a rational number as a single
+conceptual unit.
+
+for rational numbers, complex numbers, polynomials, or whatever...
+`add` and `mul` are not the primitive procedures `+` and `*` but rather more complex
+things that will perform the appropriate operations for whatever kinds of data
+we pass in as the arguments `a`, `b`, `x`, and `y`.
+
+abstraction barriers
+
+One key idea in dealing with compound data is the notion of
+*closure* — that the glue we use for combining data objects should allow
+us to combine not only primitive data objects, but compound data objects as
+well.

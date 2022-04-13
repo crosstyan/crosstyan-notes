@@ -21,7 +21,11 @@ add_one = &(&1 + 1)
 var add_one = (_:Int) + 1
 ```
 
-There’s a second form of the & function capture operator. You can give it the
+```clojure
+#(+ % 1)
+```
+
+There's a second form of the & function capture operator. You can give it the
 name and arity (number of parameters) of an existing function, and it will
 return an anonymous function that calls it. 
 
@@ -35,7 +39,7 @@ In Elixir a named function is identified by both its name and its number of
 parameters (its arity). 
 
 These two functions are totally separate as far
-as Elixir is concerned. But from a human perspective, you’d imagine that if
+as Elixir is concerned. But from a human perspective, you'd imagine that if
 two functions have the same name they are somehow related, even if they
 have a different number of parameters.
 
