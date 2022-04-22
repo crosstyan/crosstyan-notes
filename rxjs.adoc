@@ -1,0 +1,78 @@
+# RxJS
+
+## Intro
+
+I want to have a repl for typescript. Or jupyter notebook.
+
+```ts
+import { Observer, Observable, Unsubscribable } from "rxjs"
+
+// RxJS Type
+interface Unsubscribable {
+  unsubscribe(): void;
+}
+interface Observer<T> {
+  next: (value: T) => void;
+  error: (err: any) => void;
+  complete: () => void;
+}
+
+const onSubscribe: (observer:Observer<Number>)=>Unsubscribable = (observer:Observer<Number>) => {
+  console.log("subscribe")
+  let number = 1
+  const handle = setInterval(() => {
+    observer.next(number++)
+    // error will stop the observable
+    // if (number === 2) {observer.error("error")}
+    // make sure the observable will end
+    // if (number > 3) {
+    //   observer.complete()
+    // }
+  }, 1000)
+  return ({unsubscribe: () => clearInterval(handle)})
+}
+// the return of callback is the unsubscribe function
+// TearDown Logic
+const source$ = new Observable(onSubscribe)
+// next error complete
+// object has three properties (method) will be called Observer
+const theObserver:Observer<Number> = {
+  next: (x:Number) => console.log(x),
+  complete: () => console.log("complete"),
+  error: (err:string) => console.error(err)
+}
+const sub = source$.subscribe(theObserver)
+setTimeout(() => sub.unsubscribe(), 5000)
+// can also
+// source$.subscribe(next, error, complete)
+```
+
+### Hot and Code Observer
+
+> 选择 A ：错过就错过了，只需要接受从订阅那一刻开始 Observable 产生的数据就行 。 (Hot)
+选择 B ：不能错过，需要获取 Observable 之前产生的数据 。 (Cold)
+
+> 把 Observable 称为“发布者” (publisher) 而不是
+“生产者”，有意回避了“生产者”这个词，就是因为在 Hot Observable 中， Observable
+明显并不产生数据，只是数据的搬运工 。
+
+> 如果每次订阅都要产生一个新的生产者，新的生产者就像汽车引擎一样刚启动时肯
+定是冷的，所以叫 Cold Observable 。
+
+### Marble Diagram
+
+- 根据弹珠图的传统，竖杠符号 "|" 代表的是数据流的完结，对应调用下游的 complete 函数
+- 符号 × 代表数据流中的异常，对应于调用下游的 error 函数 。
+
+- https://rxviz.com/ 
+- https://rxmarbles.com/
+
+## Operator
+
+
+如果你惊叹于数组对象和 Observable 对象的相似, 那是因为这两个东西在数学概念上都是 Functor.
+Functor 有 map (<$>) (甚至是 Monad)
+
+- https://observablehq.com/@vonheikemen/about-functors
+- https://stackoverflow.com/questions/51542865/is-rxjs-observable-a-monad
+- https://www.ericponto.com/blog/2016/12/05/teaching-rxjs/

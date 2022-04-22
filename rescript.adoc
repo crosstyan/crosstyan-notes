@@ -1,0 +1,83 @@
+# Rescript and TypeScript
+
+https://rescript-lang.org/blog/bucklescript-is-rebranding[BuckleScript & Reason Rebranding]
+
+> ReScript is not just a rebranding: it's a ReasonML which freed itself of the
+yoke of the OCaml ecosystem. By doing so, it forfeited compilation to native
+code and OCaml library interop, but gained a freer syntax which further
+resembles JavaScript
+
+## Start
+
+- https://rescript-lang.org/docs/manual/latest/installation[Installation]
+- https://marketplace.visualstudio.com/items?itemName=chenglou92.rescript-vscode[rescript-vscode]
+- https://github.com/rescript-lang/rescript-project-template[rescript-lang/rescript-project-template]
+- https://medium.com/att-israel/how-i-switched-from-typescript-to-rescript-637aa5ef8d3[How I Switched from TypeScript to ReScript]
+
+[.line-through]##No `yarn create` command. Have to clone it.## See https://github.com/mahezsh/create-rescript-app[create-rescript-app]
+
+```bash
+git clone https://github.com/rescript-lang/rescript-project-template
+cd rescript-project-template
+yarn install
+yarn build
+node src/Demo.bs.js
+```
+
+Just don't use this boilerplate if you want to do something front-end stuff.
+
+### `create-rescript-app`
+
+```bash
+npx create-rescript-app my-app
+```
+
+Default is https://www.npmjs.com/package/create-rescript-app[`create-rescript-app`].
+
+See also https://github.com/rescript-lang/rescript-react[rescript-lang/rescript-react]
+
+### Vite
+
+Forget that empty boilerplate. Use something really useful.
+
+```bash
+git clone https://github.com/jihchi/vitejs-template-react-rescript
+yarn install
+yarn upgrade
+yarn build
+yarn serve
+```
+
+```bash
+yarn build -w # enable watch
+npx vite dev # development
+```
+
+modify `package.json` to add `dev` command. (no idea why it's not added by default)
+
+#### Another Way?
+
+https://www.youtube.com/watch?v=gTa2byCXSts[Getting started with ReScript React and Next.js]
+
+Add Rescript to existing project?
+
+## Fetch
+
+https://github.com/ryyppy/rescript-promise/blob/master/examples/FetchExample.res[rescript-promise fetch example]
+
+## Typescript?
+
+As a man of culture, be pragmatical.
+
+Why not just write TypeScript with https://github.com/gcanti/fp-ts[fp-ts], https://github.com/lodash/lodash/wiki/FP-Guide[lodash-fp], https://github.com/immerjs/immer[immer] and https://ramdajs.com/[ramdajs]?
+
+- https://cognitect.com/blog/2014/8/6/transducers-are-coming[transducers are coming] (an article about transducers in clojure)
+- https://mostly-adequate.gitbook.io/mostly-adequate-guide/[mostly adequate guide] (JavaScript FP)
+
+Other good stuff:
+
+- https://github.com/gvergnaud/ts-pattern[ts-pattern] for pattern matching
+- https://stackoverflow.com/questions/54786890/how-do-i-use-compose-in-typescript[How do I use compose in Typescript?] composing is basically piping
+- https://ramdajs.com/0.19.1/docs/#pipe[pipe in ramdajs]
+- https://ramdajs.com/0.19.1/docs/#compose[compose in ramdajs]
+

@@ -1,0 +1,75 @@
+# ClojureScript
+
+## Start
+
+https://github.com/thheller/shadow-cljs[thheller/shadow-cljs]
+https://github.com/filipesilva/create-cljs-app[filipesilva/create-cljs-app]
+
+```bash
+yarn create cljs-app my-app
+```
+
+Change `shadow-cljs.edn` to update the dependency. 
+
+Upgrade the JavaScript dependencies.
+
+```bash
+yarn upgrade
+yarn remove clj-kondo
+```
+
+https://github.com/clj-kondo/clj-kondo/blob/master/doc/install.md[`clj-kondo`] causes a problems so I remove it.
+Install with system package manager instead. Don't use npm. The promblem is caused by https://github.com/avh4/binwrap[`binwrap`] but no idea how to fix this.
+
+Upgrade the ClojureScript dependencies.
+
+```clojure
+;; Check the latest version by yourself
+;; ...
+ :dependencies [[reagent "1.1.1"]
+                [devcards "0.2.7"]]
+;; ...
+```
+
+Check the https://shadow-cljs.github.io/docs/UsersGuide.html[Users Guide of shadow-cljs]
+
+```bash
+yarn start
+```
+
+shadow-cljs will update the dependencies automatically.
+
+```bash
+shadow-cljs - HTTP server available at http://localhost:3001
+shadow-cljs - server version: 2.18.0 running at http://localhost:9630
+shadow-cljs - nREPL server started on port 3333
+shadow-cljs - watching build :app
+```
+
+> Error: Reagent.core/render function was moved to reagent.dom namespace in Reagent v1.0.
+
+Change `[reagent.core :as r]` to `[reagent.dom :as r]` in `src/app/core.cljs` 
+
+If you're using React18, you will get the following error. (Just use React17)
+
+> Warning: ReactDOM.render is no longer supported in React 18. Use createRoot instead. Until you switch to the new API, your app will behave as if it's running React 17. Learn more: https://reactjs.org/link/switch-to-createroot
+
+See also https://github.com/reactwg/react-18/discussions/5
+
+No idea what the fuck is this. Reagent will https://github.com/reagent-project/reagent/blob/f64821ce2234098a837ac7e280969f98ab11342e/ROADMAP.md[fix it someday].
+
+### Vite?
+
+> shadow-cljs can provide additional basic HTTP servers via the `:dev-http`
+
+Seems the web server is powered by https://github.com/ring-clojure/ring[`ring`].
+
+No reason to use Vite. shadow-cljs handles everything including packaging. But basically clojure
+is playing its own game. 
+
+
+### Tailwind
+
+- https://github.com/jacekschae/shadow-cljs-tailwindcss[jacekschae/shadow-cljs-tailwindcss]
+- https://github.com/teknql/shadow-cljs-tailwind-jit[teknql/shadow-cljs-tailwind-jit]
+

@@ -2,4 +2,7 @@
 target
 .vscode
 .metals
+.clj-kondo
+.lsp
+.vscode
 ~$*

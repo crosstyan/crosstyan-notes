@@ -36,16 +36,16 @@
 ;; (sqrt x) = the y such that y >= 0 and y^2 = x
 
 ;; Maybe one can use logic programming to solve this
-(defn not-really-sqrt [x]
-  (let [y :some-number]
-    (and (>= y 0)
-         (= (square y) x))))
+;; (defn not-really-sqrt [x]
+;;   (let [y :some-number]
+;;     (and (>= y 0)
+;;          (= (square y) x))))
 
 ;; Newton’s method of successive approximations
 ;; We can perform a simple manipulation to get a better guess
 ;; by averaging y with x/y
 
-(defn abs [x] (cond
+(defn abs' [x] (cond
                 (< x 0) (- x)
                 :else   x))
 
