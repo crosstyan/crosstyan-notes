@@ -1,0 +1,14 @@
+# Something about JavaScript
+
+Actually I mean TypeScript and functional programming.
+
+- https://en.wikipedia.org/wiki/Immediately_invoked_function_expression[Immediately Invoked Function Expression (IIFE)]
+- https://javascript.info/mixins[Mixins]
+- https://www.typescriptlang.org/docs/handbook/2/functions.html#declaring-this-in-a-function[this in Typescript]
+
+## Books
+
+- JavaScript the Good Parts
+- JavaScript Allongé
+- You Don't Know JS
+

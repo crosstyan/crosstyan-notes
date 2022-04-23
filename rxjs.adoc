@@ -1,5 +1,11 @@
 # RxJS
 
+Book using `5.5.0`, but this note is using `7.5.5`. So the API is very different.
+
+The biggest change is that `pipe` replaced `method` chain. See https://auth0.com/blog/whats-new-in-rxjs-6/[RxJS 6: What's new and what has changed?]
+
+> Use piping instead of chaining as new operator syntax. The result of one operator is piped into another operator.
+
 ## Intro
 
 I want to have a repl for typescript. Or jupyter notebook.
@@ -62,7 +68,7 @@ setTimeout(() => sub.unsubscribe(), 5000)
 ### Marble Diagram
 
 - 根据弹珠图的传统，竖杠符号 "|" 代表的是数据流的完结，对应调用下游的 complete 函数
-- 符号 × 代表数据流中的异常，对应于调用下游的 error 函数 。
+- 符号 `×` 代表数据流中的异常，对应于调用下游的 error 函数 。
 
 - https://rxviz.com/ 
 - https://rxmarbles.com/
@@ -76,3 +82,618 @@ Functor 有 map (<$>) (甚至是 Monad)
 - https://observablehq.com/@vonheikemen/about-functors
 - https://stackoverflow.com/questions/51542865/is-rxjs-observable-a-monad
 - https://www.ericponto.com/blog/2016/12/05/teaching-rxjs/
+
+- creation
+- transformation
+- filtering
+- combination
+- multicasting
+- error handling
+- utility
+- conditional & boolean
+- mathematical & aggregate
+
+> 任何河流都需要有源头，不然不管河床有多长，没有水也不能称为河。
+“创建类”操作符就是数据河流的源头，创建类操作符是没有上游的，它们是数据管道的起点
+
+- backpressure control
+- connectable
+- higher order observable
+
+> 当发大水的时候，河流下游因为河道无法让水流及时通过，水流就会淤积，逐步把
+压力传递给上游，这种现象就是“背压” 。
+上游如果有水库，就可以控制流向下游的水量，减少对河道的压力 。
+当下游对数据处理不过来的时候，可以控制数据的传输，减轻下游处理压力，
+过滤类和转化类操作构中都包含具备背压控制的成员
+
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain[Inheritance and the prototype chain] (原型链)
+
+- 有的操作符是 Observable 类的静态函数，也就是不需要 
+Observable 实例就可以执行的函数，所以称为“静态操作符” 
+(think `static` keyword in OO languages)
+- 另一类操作符是 Observable 的实例函数，前提是要有一个创建好的 Observable 对象，这一类称为“实例
+操作符” 。(think `method` in OO languages) (not exist in latest RxJS)
+
+### implementation of operator
+
+Forget about this part. Observable now can only be piped (by `pipe` function), not chained.
+
+An observable only has three public methods now: `pipe`, `forEach` and `subscribe`
+
+https://rxjs.dev/guide/observable[Observable]
+
+```ts
+import { Observer, Observable, Unsubscribable, Subscriber } from "rxjs"
+// in RxJs func is project
+// See Also https://rxjs.dev/api/operators/map
+function customRxMap<T>(this: Observable<T>, func: (x: T) => T): void {
+  const subscribe = (subscriber: Subscriber<T>) => {
+    const sub = this.subscribe({
+      next: val => subscriber.next(func(val)),
+      error: err => subscriber.error(err),
+      complete: () => subscriber.complete()
+    })
+    return undefined
+  }
+  return new Observable(subscribe)
+}
+```
+
+当不再需要从某个 Observable 对象获取数据的时候, 就要退订这个Obsrvable 对象 。
+
+```ts
+function customRxMap<T>(this: Observable<T>, func: (x: T) => T) {
+  const subscribe = (subscriber: Subscriber<T>) => {
+    const sub = this.subscribe({
+      next: val => subscriber.next(func(val)),
+      error: err => subscriber.error(err),
+      complete: () => subscriber.complete()
+    })
+    return { unsubscribe: sub.unsubscribe }
+  }
+  return new Observable(subscribe)
+}
+```
+
+在之前的 `map` 实现中，对 `project` 的调用没有保护，最后这个异常错误就被抛了出
+来，把整个程序的运行都破坏掉，这当然不是最理想的处理，更好的处理方式是捕获异
+常错误，把异常错误沿着数据流往下游传递，最终如何处理交给 Observer 来决定，这是
+更加可控的方法 。
+
+```ts
+function customRxMap<T>(this: Observable<T>, func: (x: T) => T) {
+  const subscribe = (subscriber: Subscriber<T>) => {
+    const sub = this.subscribe({
+      next: val => {
+        try { subscriber.next(func(val)) }
+        catch (err) { subscriber.error(err) }
+      },
+      error: err => subscriber.error(err),
+      complete: () => subscriber.complete()
+    })
+    return { unsubscribe: sub.unsubscribe }
+  }
+  return new Observable(subscribe)
+}
+```
+
+>如果事件处理函数只被添加而不删除，那就有产生资源泄露的危险，
+所以，一定要在退订的时候去掉挂在 DOM 上的这些事件处理函数 。
+
+https://stackoverflow.com/questions/34208195/why-cant-i-access-this-within-an-arrow-function[Why can't I access `this` within an arrow function? ]
+
+箭头函数中的 `this` 直接绑定于定义函数环境下的 `this` ，而不是执行时指定的 `this`
+
+https://github.com/tc39/proposal-bind-operator[bind operator] (`::`)
+
+https://stackoverflow.com/questions/48926644/what-is-the-difference-between-observable-lift-and-observable-pipe-in-rxjs[lift in rxjs]
+
+> `lift` @deprecated Internal implementation detail, do not use directly. Will be made internal in v8. 
+
+### pipe
+
+forget about `bind` or `lattable`. Just use `pipe`, `pipe` and compose!
+
+- `do` 改为 `tap` (side effect)
+- `catch` 改为 `catchError`
+- `switch` 改为 `switchAll`
+- `finally` 改为 `finalize`
+
+> 使用 pipeable 操作符， RxJS 才真正算得上实践了函数式编程
+
+## Creation
+
+[%header, cols="1,1"]
+|===
+|功能需求|适用的操作符
+|直接操作观察者|create
+|根据有限的数据产生同步数据流。| of
+|产生一个数值范围内的数据|range
+|以循环方式产生数据| generate
+|重复产生数据流中的数据 |repeat 和 repeatWhen
+|产生空数据流|empty
+|产生直接出错的数据流|throw
+|产生永不完结的数据流|never
+|间隔给定时间持续产生数据 |interval 和 timer
+|从数组等枚举类型数据产生数据流台 | from
+|从 Promise 对象产生数据流 |fromPrornise
+|从外部事件对象产生数据流 | fromEvent 和 fromEventPattern
+|从 AJAX 请求结果产生数据流句| ajax
+|延迟产生数据流 |defer
+|===
+
+### of
+
+https://rxjs.dev/api/index/function/of[of]
+
+```ts
+import { of } from "rxjs"
+const source$ = of(1, 2, 3)
+```
+
+需要注意的是, `source$` 被订阅时，吐出数据的过程是同步的，也就是没有任何时间
+上的间隔，挤在一起，数据产生完毕之后，对应的 Observable 对象也就完结了 。
+
+### range
+
+not interesting
+
+### generate
+
+https://rxjs.dev/api/index/function/generate[generate]
+
+like list comprehension
+
+http://www-lia.deis.unibo.it/materiale/JS/developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Array_comprehensions.html[Array comprehensions]
+https://tc39wiki.calculist.org/es6/array-comprehensions/[Array Comprehensions - TC39 Wiki]
+
+在传统的 JavaScript 编程中，如果某个问题的解决方法是用一个 `for`` 循环产生的数据
+集合，那么搬到 RxJS 的世界，就适合于使用 generate 来产生一个 Observable 对象 。
+
+### repeat
+
+```ts
+const source$ = of(1, 2, 3, 4, 5)
+const repeated$ = source$.pipe(repeat(5))
+// 1, 2, 3, 4, 5 repeat 5 times
+```
+
+`repeated$` 是 一 个全新的 Observable 对象，它并没有改变 `source$`, `source$` 自始至
+终还是只产生 1, 2, 3, 4, 5 然后就结束的数据流
+
+```ts
+const source$ = new Observable(observer => {
+  setTimeout(() => observer.next(1), 1000)
+  setTimeout(() => observer.next(2), 2000)
+  setTimeout(() => observer.next(3), 3000)
+  setTimeout(() => observer.complete(), 4000)
+  return {unsubscribe: ()=> console.log("unsubscribe")}
+})
+```
+
+repeat 只有在上游 Observable 对象完结之后才会重新订阅，因为在
+完结之前， repeat 也不知道会不会有新的数据从上游被推送下来。
+
+### Async
+
+异步数据流，或者说异步 Observable 对象，不光要考虑产生什么数据，还要考虑这
+些数据之间的时间间隔问题， RxJS 提供的操作符就是要让开发者在日常尽 量不要考虑时
+间因素。
+
+无论是简单列举数据的 of, 还是可以产生复杂组合的 range, 最后产生的 Observable 对象都是一口气把
+数据传给下游，每个数据之间没有时间间隔
+
+#### interval
+
+#### timer
+
+### from
+
+from 可能是创建类操作符中包容性最强的一个了，因为它接受的参数只要
+“像” Observable 就行，然后根据参数中的数据产生一个真正 的 Observable 对象。
+
+“像” Observable 的对象很多，一个数组就像 Observable ，一个不是数组但是“像”
+数组的对象也算，一个字符串也很像 Observable ，一个 JavaScript 中的 generator 也很像
+Observable, 一个 Promise 对象也很像，所以， from 可以把任何对象都转化为 Observable
+对象。
+
+### fromPromise
+
+fetch
+
+虽然句 `ajax` 这个操作符能够把 AJAX 请求和 RxJS 的数据流串接起来，但是从上面这
+个例子看来，代码冗长，相比于其他 AJAX 请求的处理方式真的没有什么优势，这是因
+为这个例子实在太过简单，简单的应用场景应用 RxJS 都会显得用力过度
+只有当处理复杂的逻辑时，通过操作符组合实现数据流处理才能彰显威力。
+
+### fromEvent
+
+fromEvent 的第一个参数是一个事件源， 在浏览器中， 最常见的事件源就是特定的
+DOM 元素，第二个参数是事件的名称，对应 DOM 事 件就是 click, mousemove 这样的
+字符串。
+
+fromEvent 是 DOM 和 RxJS 世界的桥梁
+
+fromEvent 除了可以从 DOM 中获得数据，还可以从 Node.js 的 events 中获得数据
+
+fromEvent 产生的是 Hot Observable
+
+### defer
+
+https://rxjs.dev/api/index/function/defer[defer]
+
+这个 Observable 只是一 个代理 ，在创建之时并不会做分配资源的工作，只有
+当被订阅的时候，才会去创建真正占用资源的 Observable
+之前产生的代理 Observable
+会把所有工作都转交给真正占用资源的 Observable 。
+
+## Combination
+
+[%header, cols="1,1"]
+|===
+|功能需求|适用的操作符
+|把多个数据流 以首尾相连方式合并 | concat 和 concatAll
+|把多个数据流中数据以先到先得方式合并 | merge 和 mergeAll
+|把多个数据流中数据以一一对应方式合并 | zip 和 zipAll
+|持续合并多个数据流中最新产生的数据 | combineLatest, combineAll 和 withLatestFrom
+|从多个数据流中选取第一个产生内容的数据流 | race
+|在数据流前面添加一个指定数据 | startWith
+|只获取多个数据流最后产生的那个数据 | forkJoin
+|从高阶数据流中切换数据源 | switch 和 exhaust
+|===
+
+### concat
+
+如果一个 Observable 对象不会完结, 那排在后面的 Observable 对象永远没有上场的机会
+
+### merge
+
+merge 会第一时间订阅所有 的上游 Observable ，然后对上游的
+数据采取“先到先得”的策略， 任何一个 Observable 只要有数据推下来，就立刻转给下游 Observable 对象。
+
+### zip
+
+数据积压问题
+
+### combineLatest
+
+zip 对上游数据只使用一次，用过一个数据之后
+就不会再用，但是 combineLatest 可能会反复使用上游产生的最新数据
+
+See also https://rxjs.dev/api/index/function/withLatestFrom[withLatestFrom]
+
+### race
+
+胜者通吃，败者则失去所有机会。
+
+第一个吐出数据的 Observable 对象就是胜者， race 产生的 Observable 就会完全采用
+胜者 Observable 对象的数据 ，其余的输入 Observable 对象则会被退订而抛弃。
+
+### forkJoin
+
+forkJoin 就 是 RxJS 界的 `Promise.all`
+
+### Higher Order Observables
+
+所谓高阶 Observable ，指的是产生的数据依然是 Observable 的 Observable。
+
+## Utils
+
+
+[%header, cols="1,1"]
+|===
+|功能需求|适用的操作符
+|统计数据流中产生的所有数据个数| count
+|获得数据流中最大或者最小的数据 | max 和 min
+|对数据流中所有数据进行规约操作 | reduce (our old friend)
+|判断是否所有数据满足某个判定条件 | every
+|找到第一个满足判定条件的数据 | find 和 find Index
+|判断一个数据流是否不包含任何数据 | isEmpty
+|如果一个数据流为空就默认产生一个指定数据 | defaultIfEmpty
+|===
+
+### reduce
+
+```haskell
+foldl :: (b -> a -> b) -> b -> t a -> b
+foldl (\acc x -> acc + x) 0 [1, 2, 3, 4]
+foldl (+) 0 [1, 2, 3, 4]
+foldl (\acc x -> ((fst acc) + x, (snd acc) + 1)) (0,0) [1, 2, 3, 4]
+```
+
+### every
+
+通常不要对一个永不完结的 Observable 对象使用 every 这个操作符，因
+为很可能产生的新 Observable 对象也是永不完结的
+
+### find
+
+有人说， RxJS 就是异步处理世界的 lodash
+
+找到上游 Observable 对象中满足判定条件的第一个数
+据，产生的 Observable 对象在吐出数据之后会立刻完结
+
+## Filter
+
+[%header, cols="1,1"]
+|===
+|功能需求|适用的操作符
+|过滤掉不满足判定条件的数据|filter
+|获得满足判定条件的第一个数据|first
+|获得满足判定条件的最后一个数据|last
+|从数据流中选取最先出现的若干数据|take
+|从数据流中选取最后出现的若干数据|takeLast
+|从数据流中选取数据直到某种情况发生|take While 和 take Until
+|从数据流中忽略最先出现的若干数据|skip
+|从数据流中忽略数据直到某种情况发生|skipwhile 和 skipUntil
+|基于时间的数据流量筛选|throttleTirne, debounceTime 和 auditTime
+|基于数据内容的数据流量筛选|throttle, debounce 和 audit
+|基于采样方式的数据流盘筛选|sample 和 sampleTime
+|删除重复的数据|distnct
+|删除重复的连续数据|distnctUntilChanged 和 distinctUntilKeyChanged
+|忽略数据流中的所有数据|ignoreElernents
+|只选取指定出现位置的数据|elementAt
+|判断是否只有一个数据满足判定条件|single
+|===
+
+回压控制操作符包含
+
+- throttle
+- debounce
+- audit
+- sample
+- throttleTime
+- debounceTime
+- auditTime
+- sampleTime
+
+不带 Time 后缀的操作符是利用另一个 Observable 对象来控制如何抛弃来自上游 Observable 对象的数据, 简单利用时间做回压控制的操作符就只能带上Time 后缀了
+
+## Transformation
+
+map, we can achieve everything.
+
+pluck 也有优点，就是能够自动处理字段不存在的情况,
+pluck 发现某一层字段为空，对应就会给下游传递 undefined
+
+### 无损回压
+
+归根结底，无损的回压控制就是把上游在一段时间内产生的数据放
+到 一个数据集合里，然后把这个数据集合一次丢给下游 。
+
+从某种意义上说，无损的回压控制，实际上就是把数据取舍的决策权交给了下游。
+
+- 将上游数据放在数组中传给下游的操作都包含 buffer 这个词
+- 将上游数据放在 Observable 中传给下游的操作符都包含 window 这个词
+
+### higher order map
+
+所有高阶 map 的操作符都有一个函数参数 project, 但是和普通 map 不同，普通 map
+只是把一个数据映射为另一个数据，而高阶 map 的函数参数 project 把一个数据映射为一
+个 Observable 对象 。
+
+不只是把 project 返回的结果丢给下游就完事，而是把每个内部 Observable 中的数据做组合，
+通俗一点 说就是 “砸平”，最后传给下游的依然是普通的一阶 Observable 对象 。
+
+`flatMap`/`>>=`
+
+- concatMap = map + concatAll
+- mergeMap = map + mergeAll
+- switchMap = map + switch
+- exhaustMap = map + exhaust
+
+> 为了向后兼容， flatMap 作为 mergeMap 的一个别名 (alias) 存在，所
+有对 mergeMap 的使用也可以用 flatMap 替代 。
+
+### scan
+
+https://rxjs.dev/api/index/function/scan[scan]
+
+> It's like reduce, but emits the current accumulation state after each update
+
+scan 可能是 RxJS 中对构建交互式应用程序最重要的一个操作符，因为它能够维持应
+用的当前状态， 一方面可以根据数据流持续更新这些状态， 另一方面可以持续把更新的
+状态传给另一个数据流用来做必要处理。
+
+## Error Handling
+
+> 看到Prorn1叫使用也有上游下游, 也有链式调用，是不是觉得 Promise 和 RxJS
+的 Observable 很类似？ 两者在范畴论中都属于 Monad 类型
+
+当 fetch 函数返回一个 Promise ，如果这次调用失败了，这个 Promise 对象也就走到头了，不可能
+让它重新尝试一次 。
+
+https://rxjs.dev/guide/observable[Observable]
+
+[%header, cols="h,1,1"]
+|===
+|       |Single 	|Multiple
+|Pull 	|Function |Iterator
+|Push 	|Promise 	|Observable
+|===
+
+如果让一个函数可以抛 (throw) 出错误异常，那这个函数就不是纯函数，因为 throw
+等于增加了一个新的函数出口，抛出去的异常会改变外部的状态。 总之，能够抛出异常
+的函数违背了函数式编程的要求。
+
+从函数调用者的角度来看，如果一个函数可能会抛出异常，那调用者不仅要关心函
+数的返回值如何处理这加重了函数调用者的负担。
+
+## Multicast
+
+> Rx.JS 是支持一个 Observable 被多次 subscribe的. 所以, Rx.JS 支持多播，但是，表面上看到的是多播，实质上还是单播。
+
+Hot Observable
+
+- fromPromise
+- fromEvent
+- fromEventPattern
+
+真正的多播，必定是无论有多少 Observer 来 subscribe, 推给 Observer 的都是一样的数据源，满足这种条件的，就是 Hot Observable
+
+Cold Observable 更“懒”体现在，如果没有订阅者，连数据都不会真正产生，对于 Hot Observable, 没有订阅者的情况下，数据依然会产生，只不过不传入数据管道。
+
+### Subject
+
+一个 Subject 既有 Observable 的接口，也具有 Observer 的接口，一个 Subject 就具备上述的两个职责。
+
+Observable 对 Observer 是没有“记忆”的 ，但是 Subject 却记得住有哪些 Observer 订阅了自己。
+
+所谓不能重复使用， 指的是一个 Subject 对象一旦被调用了 complete
+或者 error 函数，那么，它作为 Observable 的生命周期也就结束了，后续还想调用这个
+Subject 对象的 next 函数传递数据给下游，就如同泥牛入大诲，一去不回，没有任何反应。
+
+> 业界并没有习惯把 Subject 对象的变量名加上 `$` 后缀
+
+### https://www.learnrxjs.io/learn-rxjs/operators/multicasting[Multicasting Operators]
+
+- multicast
+- share
+- publish
+
+## Sheduler
+
+因为 JavaScript 是单线程的语言，根本没得选，所以 RxJS 中提供的 Scheduler 种类也没有其他 Rx 实现那么丰富多彩。
+
+RxJS 中 Scheduler 可以控制 Observable 对象产生数据的时机和节奏
+
+> ザ・ワールド
+
+Scheduler 说现在是何年何月何日几时几分几秒，那 Observable 对象就认为现在就是何年何月何日几时几分几秒
+
+## Debug & Test
+
+TODO
+
+long live the `console.log`!
+
+https://rxjs.dev/api/index/function/tap[tap] (`do` in earlier versions)
+
+> Used to perform side-effects for notifications from the source observable
+
+## RxJS and React
+
+> 但是 Angular 是一个不中立的框架。所谓“不中立”，指的是如果我们使用 Angular, 那么整个应用的结构就必须按照 Angular 的规矩来行事 。(opinionated)
+
+React 并没有要求开发者必须要使用 Flux 或者 Redux 或者 MobX 来管理数据 (Try React Context!)
+
+I know React so I skip the intro.
+
+也把“聪明组件”叫做“容器组件” (container component), 
+把“傻瓜组件”叫做“展示组件” (presentational component), 这种称呼也很形象，
+因为外层的组件的确就像是内层组件的 一个容器，而傻瓜组件的工作就是专心负责界面的展示 。
+
+Here is functional component version of https://github.com/mocheng/dissecting-rxjs/blob/master/chapter-13/react-rxjs/rxjs-container/src/Counter.js[Counter]
+
+```ts
+const RxCounter = () => {
+  const [count, setCount] = useState(0)
+  // observable should be part of state
+  // _setCounter should not be used
+  const [counter, _setCounter] = useState(new Subject<number>())
+  useEffect(() => {
+    const sub = counter.pipe(scan((res, inc)=> res + inc, 0)).subscribe(setCount)
+    return (() => sub.unsubscribe())
+  }, [counter]) // depends on counter
+  return(
+    <>
+      <button onClick={()=>counter.next(1)}>+</button>
+      <p>{`Count is ${count}`}</p>
+      <button onClick={()=>counter.next(-1)}>-</button>
+    </>
+  )
+}
+```
+
+> 组件 state 的初始化直接 以类的属性形式存在，在这里我们使用的
+是另一种方式，在 `constructor` 中给 `this.state` 赋值，两种方式的效果是一模一样的。
+
+我们创造了一个 Subject 对象，赋值给 `this.counter`，这个对象就是连接 RxJS 和 React 的纽带。
+(and it must be state to survive after component changing state)
+
+> 不难发现，用 RxJS 来管理 React 的状态有比较固定的模式，就是通过 Subject 为桥梁来连接 RxJS 数据流和 React 组件的状态。
+
+If you get used to Svelte, you will find that it's unnaturl
+to declare state by `useState`. You can just `let`.
+
+https://timdeschryver.dev/blog/unlocking-reactivity-with-svelte-and-rxjs[Unlocking reactivity with Svelte and RxJS]
+
+### HOC
+
+https://reactjs.org/docs/higher-order-components.html[HOC]
+
+Not interesting. Can't see too much benefit in functional component.
+
+### Timer
+
+```ts
+import { Observer, Observable, Unsubscribable, Subscriber, of, map, repeat, Subject, scan, interval, switchMap, EMPTY, BehaviorSubject, timeInterval } from "rxjs"
+import { padStart } from 'lodash'
+import { match } from 'ts-pattern'
+
+
+const ms2Time = (milliseconds:number) => {
+  let ms = Math.floor(milliseconds % 1000).toString()
+  let seconds = Math.floor((milliseconds / 1000) % 60).toString()
+  let minutes = Math.floor((milliseconds / (1000 * 60)) % 60).toString()
+  let hours = Math.floor(milliseconds / (1000 * 60 * 60)).toString()
+
+  return padStart(hours, 2, '0') + ":" 
+          + padStart(minutes, 2, '0') + ":" 
+          + padStart(seconds, 2, '0') + "." 
+          + padStart(ms, 3, '0');
+}
+
+const Timer = () => {
+  // no idea what's the meaning of BehaviorSubject
+  // one can achieve the same result by using Subject
+  const [subject, _setSubject] = useState(new BehaviorSubject<number|never>(0))
+  const [count, setCount] = useState(0)
+  enum Btn {
+    Start,
+    Stop,
+    Reset
+  }
+  useEffect(() => {
+    const start = interval(10).pipe(
+      timeInterval(),
+      scan((res, inc)=> res + (inc.interval), 0))
+    const stop =  EMPTY
+    const reset = of(0)
+    const sub = subject.pipe(
+      switchMap((val:Btn) => {
+        return match(val)
+                .with(Btn.Start, () => start)
+                .with(Btn.Stop, () => stop)
+                .with(Btn.Reset, () => reset)
+                .otherwise(() => reset)
+      }))
+      .subscribe(setCount)
+    return (() => sub.unsubscribe())
+  }, [subject])
+  return(
+    <>
+      <p>{`${ms2Time(count)}`}</p>
+      <button onClick={()=>subject.next(Btn.Start)}>Start</button>
+      <button onClick={()=>subject.next(Btn.Stop)}>Stop</button>
+      <button onClick={()=>subject.next(Btn.Reset)}>Reset</button>
+    </>
+  )
+}
+```
+
+当点击“停止”按钮时, switchMap 会得到一个空 Observable 对象
+给下游传递的就是它保留的最新数据，这就实现了点击“停止”时让显示时间停止的效果。
+
+## Redux
+
+Why not using `Context`?
+
+毫无疑问，一般就应该把 Provider 放在应用组件树的最顶层，
+这样所有的组件都访问唯一的 store.
+
+> `Redux` is overkill just to pass data from parent to child but `Context API` truly shines in this case. When you have a lot of dynamic data Redux got your back!
+
+## Redux-Observable
+
+https://github.com/redux-observable/redux-observable[Redux-Observable]
