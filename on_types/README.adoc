@@ -87,7 +87,7 @@ well, count from 0 to 255, you'll get 256 numbers.
 
 where latexmath:[b_i] is the i-th bit of the number,latexmath:[b_i] can only be either 0 or 1. latexmath:[b_0] is the least https://en.wikipedia.org/wiki/Significant_figures[significant bit] and latexmath:[b_7] is the most significant bit. 
 
-For humans, we usually use the https://en.wikipedia.org/wiki/Decimal[decimal] sylatexmath to represent numbers, which is base 10.
+For humans, we usually use the https://en.wikipedia.org/wiki/Decimal[decimal] system to represent numbers, which is base 10.
 
 [latexmath]
 ++++
@@ -108,7 +108,7 @@ If you're from another culture that comfortable the representation from least si
 ++++
 
 where latexmath:[d_i] is the i-th digit of the number,latexmath:[d_i] can be any number between 0 and 9. latexmath:[d_0] is the least significant digit and latexmath:[d_2] is the most significant digit.
-Note the word https://en.wikipedia.org/wiki/Numerical_digit[digit] we're using here, it's the same as the word https://en.wikipedia.org/wiki/Binary_digit[bit], but in 10-base sylatexmath.
+Note the word https://en.wikipedia.org/wiki/Numerical_digit[digit] we're using here, it's the same as the word https://en.wikipedia.org/wiki/Binary_digit[bit], but in 10-base system.
 
 What about hexadecimal (base 16)?
 
