@@ -1,0 +1,217 @@
+= About types in programming languages
+:stem: latexmath
+
+== Preface
+
+Computer have no idea of types as for the basic operations they perform. (the
+length of bit sequences is meaningful though, we will talk about it later).
+
+Types are merely for humans, to prevent them from being stupid. 
+
+I assume the reader have some basic understanding on common modern programming language, and the courage to
+explore *various programming languages*.
+
+== Bit
+
+All of the data in a computer (regardless of the type) is stored as a sequence
+of bits, and you can cast them however you want, as long as it's meaningful (to
+you, but not necessarily to the computer, after all, it's just a bunch of bits).
+
+Low-level programming languages. like
+
+- https://en.wikipedia.org/wiki/C_(programming_language)[C]
+- https://en.wikipedia.org/wiki/C%2B%2B[C++] 
+- https://www.rust-lang.org[Rust] 
+- https://ziglang.org[Zig]
+
+will be the best tools to explore this topic.  I'll use C++ as the example
+language due to its close-to-the-metal nature and its similarity to C (which
+means you can do crazy things with it without the bother of safety checks
+introduced in modern languages).
+
+Let's try a simple example:
+
+Here's how you say "make x be 1" and "make y be 0" (those are binary) in C++:
+
+[source,c++]
+----
+const bool x = 0b1;
+const bool y = 0b0;
+----
+
+Those who have some familiarity with programming languages should notice that
+I'm not using `true` and `false` here. That's because *there's no `bool` type in
+C, before C99*. You may wonder, what people did to represent the concept of true
+and false before C99?
+
+Well, just use a number! But... what's a number?
+
+=== See also
+
+- https://lkml.org/lkml/2013/8/31/138[Linus: bool is dangerous in C if you don't understand it]
+
+
+== Integer
+
+=== Byte
+
+You might heard word https://en.wikipedia.org/wiki/Byte[*byte*] before (I expect
+you do).  A byte is 8 bits, why 8? Because of historical reasons, and the
+popularity of https://en.wikipedia.org/wiki/8-bit_computing[8-bit
+microprocessors] in the 70s and 80s, whose
+https://en.wikipedia.org/wiki/Arithmetic_logic_unit[ALU (Arithmetic Logic Unit)]
+is designed to handle 8-bit numbers, so a *byte* is the basic unit of data in
+modern computers. It doesn't mean that you can't do arithmetic on numbers lower
+than 8-bit, you can always use bitwise operations to achieve that, but it's less
+efficient to do so.
+
+How many numbers can you represent with 8 bits? 
+
+[stem]
+++++
+2^8 - 1 = 2^7 + 2^6 + 2^5 + 2^4 + 2^3 + 2^2 + 2^1 + 2^0 = 255 = \textbf{0b}11111111
+++++
+
+well, count from 0 to 255, you'll get 256 numbers.
+
+[stem]
+++++
+\text{any number in bytes} = b_7 \times 2^7 + b_6 \times 2^6 + b_5 \times 2^5 + b_4 \times 2^4 + b_3 \times 2^3 + b_2 \times 2^2 + b_1 \times 2^1 + b_0 \times 2^0 = \sum_{i=0}^{7} b_i \times 2^i = \textbf{0b}b_7b_6b_5b_4b_3b_2b_1b_0
+++++
+
+where stem:[b_i] is the i-th bit of the number,stem:[b_i] can only be either 0 or 1. stem:[b_0] is the least https://en.wikipedia.org/wiki/Significant_figures[significant bit] and stem:[b_7] is the most significant bit. 
+
+For humans, we usually use the https://en.wikipedia.org/wiki/Decimal[decimal] system to represent numbers, which is base 10.
+
+[stem]
+++++
+255 = 2 \times 10^2 + 5 \times 10^1 + 5 \times 10^0
+++++
+
+If you're from another culture that comfortable the representation from least significant digit to most significant digit, you can also write it as:
+
+[stem]
+++++
+255 = 5 \times 10^0 + 5 \times 10^1 + 2 \times 10^2
+++++
+
+
+[stem]
+++++
+\text{any number in three digits} = d_2 \times 10^2 + d_1 \times 10^1 + d_0 \times 10^0 = \sum_{i=0}^{2} d_i \times 10^i = d_2d_1d_0
+++++
+
+where stem:[d_i] is the i-th digit of the number,stem:[d_i] can be any number between 0 and 9. stem:[d_0] is the least significant digit and stem:[d_2] is the most significant digit.
+Note the word https://en.wikipedia.org/wiki/Numerical_digit[digit] we're using here, it's the same as the word https://en.wikipedia.org/wiki/Binary_digit[bit], but in 10-base system.
+
+What about hexadecimal (base 16)?
+
+[cols="1h,16*"]
+|===
+| Decimal | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15
+| Hexadecimal | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | A | B | C | D | E | F
+|=== 
+
+I set up this cheat sheet for you (and myself, since I have a bad memory and can't do math in my head).
+
+[stem]
+++++
+256 = \textbf{F} \times 16^0 + \textbf{F} \times 16^1 = 15 \times 16^0 + 15 \times 16^1 = \textbf{0x}\text{FF}
+++++
+
+[stem]
+++++
+\text{any number in two nibbles} = n_0 \times 16^0 + n_1 \times 16^1 = \sum_{i=0}^{1} n_i \times 16^i = \textbf{0x}n_1n_0
+++++
+
+where stem:[n_i] is the i-th nibble of the number,stem:[n_i] can be any number
+between 0 and 15 (or 0 and *F* in hexadecimal).
+stem:[n_0] is the least significant nibble and stem:[n_1] is
+the most significant nibble.
+
+Hey, what's a https://en.wikipedia.org/wiki/Nibble[nibble]? It's half a byte, 4 bits, just like bit and digit, but in base 16.
+
+I won't bother teach you how to convert between different bases, just use the
+calculator.  I'll omit the https://en.wikipedia.org/wiki/Octal[octal] (base 8)
+since it's not used in modern computing any more, though some classic tutorials
+will mention it.
+
+You may wonder, what's the `0x` and `0b` in front of the numbers? `0x` means the
+number is represented in hexadecimal, and `0b` means the number is represented
+in binary. If there's no prefix, it's in decimal, perfect for humans.
+
+Modern programming languages will allow you directly write numbers in binary and
+hexadecimal
+
+[source,c++]
+----
+// the `'` is for readability (grouping by human, have no actual meaning for the machine)
+// just like you write 1000000 as 1,000,000
+const auto binary = 0b0010'1010;
+// `auto` tells the compiler to infer the type of the variable
+const auto decimal = 42;
+const auto hexadecimal = 0x2A; // or 0x2a, the case doesn't matter here
+assert(binary == decimal && binary == hexadecimal && decimal == hexadecimal);
+----
+
+[source,python]
+----
+from typing import Final
+
+# more on type annotation later
+binary:Final[int] = 0b0010_1010
+# ignoring the type annotation is fine
+# usually it's how you write it when you're introduced to python
+decimal = 42
+hexadecimal = 0x2A
+assert binary == decimal == hexadecimal
+----
+
+[source,js]
+----
+const binary = 0b0010_1010;
+const decimal = 42;
+const hexadecimal = 0x2A;
+console.assert(binary === decimal && binary === hexadecimal && decimal === hexadecimal);
+----
+
+[source,clojure]
+----
+(let [;; clojure don't have number separator and have no 0b prefix for binary number
+      ;; 2r is the base prefix (binary is 2 base)
+      binary 2r00101010 
+      decimal 42 ;; 10r42
+      hexadecimal 16r2A] ;; or 0x2A 
+      (assert (= binary decimal hexadecimal)))
+----
+
+[source,haskell]
+----
+import Control.Exception (assert) -- for assert function
+binary = 0b0010_1010
+decimal = 42
+hexadecimal = 0x2a
+-- note the function signature/prototype of assert is 
+-- assert :: Bool -> a -> a
+-- more on function signature later
+assert (binary == decimal && binary == hexadecimal && decimal == hexadecimal) (putStrLn "ok")
+-- expect to see "ok" printed
+----
+
+`assert` is the first function we see here. I'd describe the type of `assert` (except Haskell https://downloads.haskell.org/~ghc/6.12.2/docs/html/users_guide/assertions.html[`assert`], which as I said, has different signature) as 
+
+[source,typescript]
+----
+assert: (boolean) => void | never
+----
+
+It takes a boolean value, do nothing if it's true, and throw an error if it's false.
+
+NOTE: https://basarat.gitbook.io/typescript/type-system/never[`never`] represents a https://en.wikipedia.org/wiki/Bottom_type[bottom type], which mean the function will never return (i.e. the execution flow will never reach the next expression, unless wrapped in a https://en.wikipedia.org/wiki/Exception_handling_syntax[`try-catch`] block). The flow of execution will be messed up and it's a common technique for some programming language to handle error.
+
+We'll talk more on function type later. Let's keep going with the integer.
+
+=== Integer longer than 8 bits
+
+What if you want to represent a number larger than 255? You can use more bytes!
+Just like we stack more digits to represent a larger number in decimal.
