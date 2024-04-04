@@ -221,7 +221,7 @@ assert: (boolean) => void | never
 
 It takes a boolean value, do nothing if it's true, and throw an error if it's false.
 
-NOTE: https://basarat.gitbook.io/typescript/type-sylatexmath/never[`never`] represents a https://en.wikipedia.org/wiki/Bottom_type[bottom type], which mean the function will never return (i.e. the execution flow will never reach the next expression, unless wrapped in a https://en.wikipedia.org/wiki/Exception_handling_syntax[`try-catch`] block). The flow of execution will be messed up and it's a common technique for some programming language to handle error.
+NOTE: https://basarat.gitbook.io/typescript/type-system/never[`never`] represents a https://en.wikipedia.org/wiki/Bottom_type[bottom type], which mean the function will never return (i.e. the execution flow will never reach the next expression, unless wrapped in a https://en.wikipedia.org/wiki/Exception_handling_syntax[`try-catch`] block). The flow of execution will be messed up and it's a common technique for some programming language to handle error.
 
 We'll talk more on function type later. Let's keep going with the integer.
 
