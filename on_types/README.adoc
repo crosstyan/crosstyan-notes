@@ -50,6 +50,7 @@ Well, just use a number! But... what's a number?
 === See also
 
 - https://lkml.org/lkml/2013/8/31/138[Linus: bool is dangerous in C if you don't understand it]
+- https://en.wikipedia.org/wiki/TEST_(x86_instruction)[TEST instruction] in x86 assembly
 
 
 == Integer
@@ -110,20 +111,29 @@ If you're from another culture that comfortable the representation from least si
 where latexmath:[d_i] is the i-th digit of the number,latexmath:[d_i] can be any number between 0 and 9. latexmath:[d_0] is the least significant digit and latexmath:[d_2] is the most significant digit.
 Note the word https://en.wikipedia.org/wiki/Numerical_digit[digit] we're using here, it's the same as the word https://en.wikipedia.org/wiki/Binary_digit[bit], but in 10-base system.
 
-What about hexadecimal (base 16)?
+Hexadecimal, base 16, is also widely used. I set up this cheat sheet for you (and myself, since I have a bad memory and can't do math in my head).
 
 [cols="1h,16*"]
 |===
-| Decimal | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15
-| Hexadecimal | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | A | B | C | D | E | F
+| Dec | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15
+| Hex | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | A | B | C | D | E | F
+| Bin | 0000 | 0001 | 0010 | 0011 | 0100 | 0101 | 0110 | 0111 | 1000 | 1001 | 1010 | 1011 | 1100 | 1101 | 1110 | 1111
 |=== 
 
-I set up this cheat sheet for you (and myself, since I have a bad memory and can't do math in my head).
+You can see the advantage of hexadecimal now, it *IS* 4 bits! You can now
+represent any 4-bit number with a single character. Hexadecimal is just a
+convenient way to represent binary numbers without using a lot of characters (to
+save the space of writing down on paper)
 
 [latexmath]
 ++++
-256 = \text{F} \times 16^1 + \text{F} \times 16^0 = 15 \times 16^1 + 15 \times 16^0 = \textbf{0x}\text{FF}
+255 = \text{F} \times 16^1 + \text{F} \times 16^0 = 15 \times 16^1 + 15 \times 16^0 = \textbf{0x}\text{FF}
 ++++
+
+You can see two nibbles can represent a byte, that's neet! Remember byte is the
+basic calculation unit in modern computers. (Actually it's
+https://en.wikipedia.org/wiki/Word_(computer_architecture)[word] for ALU, that's
+another story)
 
 [latexmath]
 ++++
