@@ -77,7 +77,12 @@ well, count from 0 to 255, you'll get 256 numbers.
 
 [latexmath]
 ++++
-\text{any number in bytes} = b_7 \times 2^7 + b_6 \times 2^6 + b_5 \times 2^5 + b_4 \times 2^4 + b_3 \times 2^3 + b_2 \times 2^2 + b_1 \times 2^1 + b_0 \times 2^0 = \sum_{i=0}^{7} b_i \times 2^i = \textbf{0b}b_7b_6b_5b_4b_3b_2b_1b_0
+\text{any number in bytes} = b_7 \times 2^7 + b_6 \times 2^6 + b_5 \times 2^5 + b_4 \times 2^4 + b_3 \times 2^3 + b_2 \times 2^2 + b_1 \times 2^1 + b_0 \times 2^0 
+++++
+
+[latexmath]
+++++
+\text{any number in bytes} = \sum_{i=0}^{7} b_i \times 2^i = \textbf{0b}b_7b_6b_5b_4b_3b_2b_1b_0
 ++++
 
 where latexmath:[b_i] is the i-th bit of the number,latexmath:[b_i] can only be either 0 or 1. latexmath:[b_0] is the least https://en.wikipedia.org/wiki/Significant_figures[significant bit] and latexmath:[b_7] is the most significant bit. 
@@ -117,12 +122,12 @@ I set up this cheat sheet for you (and myself, since I have a bad memory and can
 
 [latexmath]
 ++++
-256 = \textbf{F} \times 16^0 + \textbf{F} \times 16^1 = 15 \times 16^0 + 15 \times 16^1 = \textbf{0x}\text{FF}
+256 = \textbf{F} \times 16^1 + \textbf{F} \times 16^0 = 15 \times 16^1 + 15 \times 16^0 = \textbf{0x}\text{FF}
 ++++
 
 [latexmath]
 ++++
-\text{any number in two nibbles} = n_0 \times 16^0 + n_1 \times 16^1 = \sum_{i=0}^{1} n_i \times 16^i = \textbf{0x}n_1n_0
+\text{any number in two nibbles} = n_0 \times 16^1 + n_1 \times 16^0 = \sum_{i=0}^{1} n_i \times 16^i = \textbf{0x}n_1n_0
 ++++
 
 where latexmath:[n_i] is the i-th nibble of the number,latexmath:[n_i] can be any number
@@ -142,7 +147,7 @@ number is represented in hexadecimal, and `0b` means the number is represented
 in binary. If there's no prefix, it's in decimal, perfect for humans.
 
 Modern programming languages will allow you directly write numbers in binary and
-hexadecimal
+hexadecimal. Here's a C++ example:
 
 [source,c++]
 ----
@@ -154,6 +159,8 @@ const auto decimal = 42;
 const auto hexadecimal = 0x2A; // or 0x2a, the case doesn't matter here
 assert(binary == decimal && binary == hexadecimal && decimal == hexadecimal);
 ----
+
+Everyone's favorite, Python, also supports this:
 
 [source,python]
 ----
@@ -168,13 +175,17 @@ hexadecimal = 0x2A
 assert binary == decimal == hexadecimal
 ----
 
+JavaScript, nothing special here:
+
 [source,js]
 ----
-const binary = 0b0010_1010;
-const decimal = 42;
-const hexadecimal = 0x2A;
-console.assert(binary === decimal && binary === hexadecimal && decimal === hexadecimal);
+const binary = 0b0010_1010
+const decimal = 42
+const hexadecimal = 0x2A
+console.assert(binary === decimal && binary === hexadecimal && decimal === hexadecimal)
 ----
+
+Clojure support any base number, by using the base prefix:
 
 [source,clojure]
 ----
@@ -185,6 +196,8 @@ console.assert(binary === decimal && binary === hexadecimal && decimal === hexad
       hexadecimal 16r2A] ;; or 0x2A 
       (assert (= binary decimal hexadecimal)))
 ----
+
+Haskell, please note that the `assert` is not the same as those mentioned above.
 
 [source,haskell]
 ----
