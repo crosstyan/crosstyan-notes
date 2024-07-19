@@ -26,43 +26,13 @@ sudo apt install \
     firefox-esr
 ```
 
-Note that `nodm` is a display manager but alternative to `lightdm`, `gdm3`, `sddm`, etc.
+## No need
+
+Note that https://github.com/spanezz/nodm[`nodm`] is a display manager but alternative to `lightdm`, `gdm3`, `sddm`, etc.
 
 in `/etc/defaults/nodm`
 
-```bash
-NODM_ENABLED=true
-NODM_USER=root
-```
-
-in `/usr/share/X11/xorg.conf.d/xorg.conf`
-
-```bash
-Section "Device"
-    Identifier  "Configured Video Device"
-    Driver      "dummy"
-    # Default is 4MiB, this sets it to 16MiB
-    VideoRam    16384
-EndSection
-
-Section "Monitor"
-    Identifier  "Configured Monitor"
-    HorizSync 31.5-48.5
-    VertRefresh 50-70
-EndSection
-
-Section "Screen"
-    Identifier  "Default Screen"
-    Monitor     "Configured Monitor"
-    Device      "Configured Video Device"
-    DefaultDepth 24
-    SubSection "Display"
-    Depth 24
-    # Whatever resolution you want
-    Modes "1024x800"
-    EndSubSection
-EndSection
-```
+in `/usr/share/X11/xorg.conf.d/xorg.conf` or `/etc/X11/xorg.conf.d/xorg.conf`
 
 Restart your `nodm` service
 
@@ -70,7 +40,6 @@ Restart your `nodm` service
 # equivalent to restart `nodm`
 sudo systemctl restart display-manager
 ```
-
 
 in your `~/.vnc/xstartup`
 
@@ -115,3 +84,54 @@ could However manually kill it
 ```
 vncserver -kill :1
 ```
+
+Check your display (after you start your VNC server)
+
+```bash
+DISPLAY=:1 xrandr
+# change resolution, for fun
+DISPLAY=:1 xrandr --output VNC-0 --mode 1280x960
+```
+
+Firefox start with a strange resolution (like 960x960?)
+No idea how to fix it
+
+Might needs a WM... https://stackoverflow.com/questions/1515752/x11-unable-to-maximize-applications-when-no-window-manager-is-used[X11 unable to maximize applications when no window manager is used].
+
+Let's pick one.
+
+https://wiki.archlinux.org/title/window_manager[Window manager]
+
+- http://fluxbox.org/screenshots/[fluxbox]
+- https://www.usenix.org/legacy/publications/library/proceedings/usenix03/tech/freenix03/full_papers/allum/allum_html/matchbox.html[matchbox]
+
+```bash
+git clone https://git.suckless.org/dwm
+git clone https://git.suckless.org/dmenu
+```
+
+https://packages.debian.org/search?searchon=contents&keywords=X11%2FXlib.h&mode=path&suite=stable&arch=any[X11/Xlib.h] install with `libx11-dev` and `libxft-dev` 
+
+comment out `Xinerama`
+
+```bash
+sudo make clean install
+```
+
+```bash
+#!/bin/bash
+export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
+export XDG_RUNTIME_DIR=/run/user/1000
+
+export DISPLAY=:1
+dwm
+```
+
+DWM can't use without keyboard (it's not very convenient to send ctrl/alt in VNC)
+
+```
+libxpm-dev
+libxrandr-dev
+```
+
+https://joewing.net/projects/jwm/[jwm] seems to be a good choice
