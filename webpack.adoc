@@ -1,2 +1,0 @@
-
-- https://github.com/Colt/webpack-demo-app[Colt/webpack-demo-app: Accompanies my 10-part Youtube Webpack course. Each commit comes with detailed notes.]

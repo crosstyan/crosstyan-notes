@@ -1,0 +1,104 @@
+== Qemu Static for different Architecture
+
+https://wiki.debian.org/Debootstrap[Debootstrap] to get the rootfs for the different architecture
+
+https://archlinux.org/packages/extra/x86_64/qemu-user-static/[qemu-user-static] to run the different architecture on the host
+
+```bash
+sudo pacman -S qemu-user-static
+cp /usr/bin/qemu-arm-static $CHROOT_DIR/usr/bin/ # arm/armeabi/armhf
+cp /usr/bin/qemu-aarch64-static $CHROOT_DIR/usr/bin/ # arm64/aarch64
+chroot $CHROOT_DIR qemu-arm-static /bin/bash
+```
+
+where `$CHROOT_DIR` is the path to the rootfs
+
+=== Schroot
+
+- http://logan.tw/posts/2018/02/24/manage-chroot-environments-with-schroot/[Manage chroot environments with schroot]
+- https://wiki.debian.org/Schroot[Debian Wiki on Schroot]
+- https://www.hellion.org.uk/blog/posts/foreign-chroots-with-schroot-and-qemu/[Foreign chroots with schroot and qemu]
+- https://wiki.archlinux.org/title/Binfmt_misc_for_Java[Arch Wiki on binfmt_misc for Java]
+- https://bbs.archlinux.org/viewtopic.php?id=100039[`nssdatabases: /usr/bin/stat: cannot stat '/etc/networks': No such file or directory`]
+- https://superuser.com/questions/664950/schroot-build-environment-setup-how-to-avoid-bind-mount-home[Schroot build environment setup: How to avoid bind-mount home]
+- https://askubuntu.com/questions/257290/configure-proxy-for-apt[Configure proxy for apt]
+
+```bash
+sudo schroot -c $CHROOT_NAME -u root -- mount -t proc none /proc
+sudo schroot -c $CHROOT_NAME -u root -- mount -t sysfs none /sys
+sudo schroot -c $CHROOT_NAME -u root -- mount -t devpts none /dev/pts
+```
+
+where `$CHROOT_NAME` is the name of the chroot environment
+
+Or you don't have to it, since schroot will have https://wiki.archlinux.org/title/fstab[`fstab`] configured
+
+==== Profile
+
+I would create a profile called `nosync`, since I don't want to sync the profile.
+
+```bash
+# in /etc/schroot
+> tree nosync
+nosync
+├── copyfiles
+├── fstab
+└── nssdatabases
+```
+
+.fstab
+[source]
+----
+# fstab: static file system information for chroots.
+# Note that the mount point will be prefixed by the chroot path
+# (CHROOT_PATH)
+#
+# <file system> <mount point>   <type>  <options>       <dump>  <pass>
+/proc           /proc           none    rw,bind         0       0
+/sys            /sys            none    rw,bind         0       0
+/dev            /dev            none    rw,bind         0       0
+/dev/pts        /dev/pts        none    rw,bind         0       0
+/tmp            /tmp            none    rw,bind         0       0
+
+# It may be desirable to have access to /run, especially if you wish
+# to run additional services in the chroot.  However, note that this
+# may potentially cause undesirable behaviour on upgrades, such as
+# killing services on the host.
+#/run           /run            none    rw,bind         0       0
+#/run/lock      /run/lock       none    rw,bind         0       0
+#/dev/shm       /dev/shm        none    rw,bind         0       0
+#/run/shm       /run/shm        none    rw,bind         0       0
+----
+
+.nssdatabases
+[source]
+----
+# System databases to copy into the chroot from the host system.
+#
+# <database name>
+# passwd
+# shadow
+# group
+# gshadow
+# services
+# protocols
+# networks
+# hosts
+----
+
+We're copy nothing
+
+Here's the configuration of `arm-sd` chroot
+
+.chroot.d/arm-sd
+[source,ini]
+----
+[arm-sd]
+description=Arm32 on SDCard, on /mnt/sd
+type=directory
+directory=/mnt/sd
+preserve-environment=false
+groups=sudo
+root-groups=sudo
+profile=nosync
+----
