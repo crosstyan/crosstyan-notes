@@ -1,0 +1,117 @@
+# VNC
+
+- https://askubuntu.com/questions/1254101/vnc-server-is-accessible-only-for-localhost[VNC Server is accessible only for localhost]
+- https://web.archive.org/web/20150912064745/http://blog.mediafederation.com:80/andy-hawkins/ubuntu-headless-vnc-vesa-800x600-fix/[Ubuntu Headless VNC VESA 800×600 Fix]
+- https://askubuntu.com/questions/1033436/how-to-use-ubuntu-18-04-on-vnc-without-display-attached[How to use Ubuntu 18.04 on VNC without display attached?]
+- https://askubuntu.com/questions/453109/add-fake-display-when-no-monitor-is-plugged-in[Add Fake Display when No Monitor is Plugged In]
+- https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/7/html/system_administrators_guide/ch-tigervnc#sec-terminating-vnc-session[TigerVNC on Red Hat]
+- https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-vnc-on-ubuntu-20-04[How To Install and Configure VNC on Ubuntu 20.04]
+- https://askubuntu.com/questions/1220/how-to-restart-x-window-server-from-command-line[How to restart X Window Server from command line?]
+- https://askubuntu.com/questions/151697/login-into-xfce-session-without-display-manager[Login into XFCE session without display manager]
+- https://repost.aws/knowledge-center/ec2-linux-2-install-gui[How do I install a GUI on my Amazon EC2 instance that's running Amazon Linux 2?]
+
+No https://wiki.archlinux.org/title/display_manager[Display Manger], no https://wiki.archlinux.org/title/desktop_environment[Desktop environment], only Xorg, VNC and Firefox.
+
+Note that there's no need for Xfce.
+
+```bash
+sudo apt install \
+    tightvncserver \
+    xserver-xorg-core \
+    xinit \
+    xserver-xorg-video-dummy \
+    nodm \
+    dbus-x11 \
+    psmisc \
+    firefox-esr
+```
+
+Note that `nodm` is a display manager but alternative to `lightdm`, `gdm3`, `sddm`, etc.
+
+in `/etc/defaults/nodm`
+
+```bash
+NODM_ENABLED=true
+NODM_USER=root
+```
+
+in `/usr/share/X11/xorg.conf.d/xorg.conf`
+
+```bash
+Section "Device"
+    Identifier  "Configured Video Device"
+    Driver      "dummy"
+    # Default is 4MiB, this sets it to 16MiB
+    VideoRam    16384
+EndSection
+
+Section "Monitor"
+    Identifier  "Configured Monitor"
+    HorizSync 31.5-48.5
+    VertRefresh 50-70
+EndSection
+
+Section "Screen"
+    Identifier  "Default Screen"
+    Monitor     "Configured Monitor"
+    Device      "Configured Video Device"
+    DefaultDepth 24
+    SubSection "Display"
+    Depth 24
+    # Whatever resolution you want
+    Modes "1024x800"
+    EndSubSection
+EndSection
+```
+
+Restart your `nodm` service
+
+```bash
+# equivalent to restart `nodm`
+sudo systemctl restart display-manager
+```
+
+
+in your `~/.vnc/xstartup`
+
+```bash
+#!/bin/bash
+export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
+export XDG_RUNTIME_DIR=/run/user/1000
+
+export DISPLAY=:1
+firefox
+```
+
+Make `dconf` happy. Might be relate to the environment variables `DBUS_SESSION_BUS_ADDRESS`
+
+```bash
+sudo mkdir -p /run/user/1000
+sudo chown $USER /run/user/1000/
+```
+
+Config your the password of your VNC server. It seems it doesn't happy with `root` user. 
+
+Normally you'll need https://qbee.io/misc/reverse-ssh-tunneling-the-ultimate-guide/[SSH Reverse Tunnel]
+to make it secure, map the remote `5901` to your local port.
+
+If you wish you could run it with `0.0.0.0`, otherwise it will only be accessible from `localhost`.
+
+```bash
+vncserver -localhost no :1
+```
+
+If you really don't care about security (I don't, since I just run a browser, what could it go wrong?)
+You could even disable password
+
+```bash
+echo SecurityTypes=None >> ~/.vnc/config
+vncserver -localhost no :1 --I-KNOW-THIS-IS-INSECURE
+```
+
+Closing that browser on GUI side will stop the VNC server in this config. You
+could However manually kill it
+
+```
+vncserver -kill :1
+```
