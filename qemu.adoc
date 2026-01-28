@@ -9,12 +9,14 @@ sudo pacman -S qemu-user-static
 cp /usr/bin/qemu-arm-static $CHROOT_DIR/usr/bin/ # arm/armeabi/armhf
 cp /usr/bin/qemu-aarch64-static $CHROOT_DIR/usr/bin/ # arm64/aarch64
 chroot $CHROOT_DIR qemu-arm-static /bin/bash
+sudo schroot -c arm-sd --directory / bash
 ```
 
 where `$CHROOT_DIR` is the path to the rootfs
 
 === Schroot
 
+- https://archlinux.org/packages/extra/x86_64/qemu-user-static-binfmt/[qemu-user-static-binfmt on ArchLinux]
 - http://logan.tw/posts/2018/02/24/manage-chroot-environments-with-schroot/[Manage chroot environments with schroot]
 - https://wiki.debian.org/Schroot[Debian Wiki on Schroot]
 - https://www.hellion.org.uk/blog/posts/foreign-chroots-with-schroot-and-qemu/[Foreign chroots with schroot and qemu]

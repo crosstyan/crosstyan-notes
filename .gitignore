@@ -8,3 +8,4 @@ target
 ~$*
 *.exe
 .calva
+.DS_Store
